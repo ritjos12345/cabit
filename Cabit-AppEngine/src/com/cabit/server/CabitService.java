@@ -10,63 +10,80 @@ import com.cabit.annotation.ServiceMethod;
  *	This class is the business logic (the class that will be accessible from RPC )
  * 
  */
-public class CabitService {
-	
-	// TODO y all the methods are statics????
-	
+public class CabitService {	
 	static DataStore db = new DataStore();
-    /*public static Location createLocation() {
-            return db.update(new Location());
-    }
-
-    public static Location readLocation(String userEmail) {
-            return db.find("");
-    }
-
-    public static Location updateLocation(Location location) {
-            location.setUserEmail(DataStore.getUserEmail());
-            location = db.update(location);
-            //DataStore.sendC2DMUpdate(LocationChange.UPDATE + LocationChange.SEPARATOR + location.getId());
-            DataStore.sendC2DMUpdate("coool" + location.getUserEmail());
-            return location;
-
-    }
-
-    public static void deleteLocation(Location location) {
-
-            db.delete(location.getUserEmail());
-    }
-    
-    
-    public static List<Location> queryLocations() {
-            return db.findAll();
-    }
-    
-*/
+	
 	@ServiceMethod
-	public Location createLocation() {
-		return new Location();
+	public String OrderCab(String cabName, Location from, Location to ) {
+		Order ord = db.createOrder(Utils.getUserEmail(),cabName,from,to);
+		SendOrderToCab(ord);
+		return ord.getCab();
+	}
+	
+	@ServiceMethod
+	public String OrderCab( Location from, Location to ) {
+		return OrderCab(db.findClosestCab(from).getTitle(),from,to);
+	}
+	
+
+	@ServiceMethod
+	public void CancelOrder() {
+		db.findOrder(Utils.getUserEmail());
+		// TODO send c2dm
+	}
+	
+	@ServiceMethod
+	public void updateMyLocation(Location location) {
+		db.updateMyLocation(location);
+	}
+	
+
+	
+	@ServiceMethod
+	public void deleteMyLocation() {
+		db.deleteMyLocation(Utils.getUserEmail());
 	}
 
 	@ServiceMethod
-	public Location readLocation(String userEmail) {
-		return db.find(userEmail);
+	public List<Location> getAllCabs() {
+		return db.findAllCabLocation();
 	}
-
+	
 	@ServiceMethod
-	public Location updateLocation(Location location) {
-		return db.update(location);
+	public List<Location> addressToLocation(String address) {
+		// TODO
+		return null;
 	}
-
-	@ServiceMethod
-	public void deleteLocation(String userEmail) {
-		db.delete(userEmail);
-
+	
+	
+	private void SendOrderToCab( Order order ){
+		String message= "NEW_ORDER";
+		message+= "," + order.getUser();
+		message+= "," + order.getFrom();
+		message+= "," + order.getTo();
+		Utils.sendC2DMUpdate(order.getCab(), message);
 	}
-
-	@ServiceMethod
-	public List<Location> queryLocations() {
-		return db.findAll();
+	
+	private void CancelOrderToCab(String cabName,Order order){
+		String message= "CANCEL_ORDER";
+		message+= "," + order.getUser();
+		
+		Utils.sendC2DMUpdate(cabName, message);
 	}
-
+	
+	private void SendClientOrder(String cabName,Order order){
+		String message= "NEW_ORDER";
+		message+= "," + order.getCab();
+		message+= "," + order.getFrom();
+		message+= "," + order.getTo();
+		Utils.sendC2DMUpdate(cabName, message);
+	}
+	
+	private void CancelClientOrder(String cabName,Order order){
+		String message= "CANCEL_ORDER";
+		message+= "," + order.getCab();
+		Utils.sendC2DMUpdate(cabName, message);
+	}
+	
+   
 }

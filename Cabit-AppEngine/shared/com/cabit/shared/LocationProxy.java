@@ -8,13 +8,10 @@ import com.google.web.bindery.requestfactory.shared.ValueProxy;
 @ProxyForName(value = "com.cabit.server.Location", locator = "com.cabit.server.LocationLocator")
 public interface LocationProxy extends ValueProxy {
 
-	Date getDate();
+	
+	String getTitle();
 
-	void setDate(Date date);
-
-	String getUserEmail();
-
-	void setUserEmail(String userEmail);
+	void setTitle(String title);
 
 	int getLatitude();
 

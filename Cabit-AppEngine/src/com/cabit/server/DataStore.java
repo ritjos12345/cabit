@@ -22,32 +22,56 @@ public class DataStore {
 	
 	
 	private HashMap<String,Location> map;
+	private List<Order> orders;
 	
 	public DataStore() {
 		map = new HashMap<String, Location>();
+		orders = new LinkedList<Order>();
+		
+		// TODO delete this 
 		Location l = new Location();
-		l.setDate(null);
 		l.setLatitude(19240000);
 		l.setLongitude(-99120000);
-		l.setUserEmail("www.udi@gmail.com");
-		update(l);
-	}
-	public Location update(Location location) {
+		l.setTitle("www.udi@gmail.com");
+		map.put(l.getTitle(), l);
 		
-		map.put(location.getUserEmail(), location);
+	}
+	
+	public Order createOrder(String user,String cab,Location from,Location to ){
+		Order order = new Order();
+		orders.add( order);
+		order.setUser(user);
+		order.setCab(cab);
+		order.setFrom(from);
+		order.setTo(to);
+		return order;
+	}
+	
+	public Order findOrder(String user){
+		for (Order ord : orders) {
+			if(ord.getUser() == user || ord.getCab() == user){
+				return ord;
+			}
+		}
+		return null;
+	}
+	
+	public Location updateMyLocation(Location location) {
+		String cabName = Utils.getUserEmail();
+		location.setTitle(cabName);
+		map.put(cabName, location);
 		return location;
 	}
 	
-	public Location find(String userEmail) {
-		
-		return map.get(userEmail);
+	public Location findCabLocation(String cab) {
+		return map.get(cab);
 	}
 
-	public void delete(String userEmail) {
-		map.remove(userEmail);
+	public void deleteMyLocation(String cab) {
+		map.remove(cab);
 	}
 
-	public List<Location> findAll() {
+	public List<Location> findAllCabLocation() {
 		List<Location> list = new LinkedList<Location>();
 		for (Location location : map.values()) {
 			list.add(location); 
@@ -55,22 +79,21 @@ public class DataStore {
 		return list;
 	}
 	
-	
-	
-	// TODO move to other class
-	public static ServletContext getServletContext (){
-		return  RequestFactoryServlet.getThreadLocalRequest().getSession().getServletContext();
-	}
-	
-	public static String getUserEmail() {
-	 UserService userService = UserServiceFactory.getUserService();
-     User user = userService.getCurrentUser();
-     return user.getEmail();
-   }
-
-	public static void sendC2DMUpdate(String string) {
-		// TODO Auto-generated method stub
+	// Can return null in case there are no cabs!
+	public Location findClosestCab(Location myLocation ) {
 		
+		Location bestCab = null;
+		double min = 0; 
+		for (Location location : map.values()) {
+			double tmp = location.distanceTo(myLocation);
+			if(bestCab == null || tmp <=min){
+				min = tmp;
+				bestCab = location;
+			}
+		} 
+		return bestCab;
 	}
+	
+	
 
 }

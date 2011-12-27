@@ -1,5 +1,5 @@
-/*
- * Copyright 2011 Google Inc.
+
+ /* Copyright 2011 Google Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -12,8 +12,9 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- 
-package com.cabit.server;
+ */
+
+package com.cabit.server.infrastructure;
 
 import com.google.android.c2dm.server.C2DMessaging;
 import com.google.android.c2dm.server.PMF;
@@ -28,9 +29,9 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContext;
 
-*//** example to 
+/** example to 
  * Send a message using C2DM.
- *//*
+ */
 public class SendMessage {
 
   private static final Logger log = Logger.getLogger(SendMessage.class.getName());
@@ -118,4 +119,3 @@ public class SendMessage {
         "message", message);
   }
 }
-*/

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cabit.server;
+package com.cabit.server.infrastructure;
 
 import com.google.android.c2dm.server.PMF;
 import com.google.appengine.api.datastore.Key;

@@ -1,5 +1,6 @@
 package com.cabit.server;
 
+import java.awt.image.TileObserver;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -12,70 +13,50 @@ import javax.servlet.ServletContext;
 
 @Entity
 public class Location {
-	private Date date;	
-	private String userEmail;
+	
+	private String title;
 	private int latitude;
 	private int longitude;
 	
-
 	public Location() {
 		
 	}
-
 	
-	
-	public Date getDate() {
-		return date;
+	public String getTitle() {
+		return title;
 	}
 
-
-
-	public void setDate(Date date) {
-		this.date = date;
+	public void setTitle(String title) {
+		this.title = title;
 	}
-
-
-
-	public String getUserEmail() {
-		return userEmail;
-	}
-
-
-
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
-	}
-
-
 
 	public int getLatitude() {
 		return latitude;
 	}
 
-
-
 	public void setLatitude(int latitude) {
 		this.latitude = latitude;
 	}
-
-
 
 	public int getLongitude() {
 		return longitude;
 	}
 
-
-
 	public void setLongitude(int longitude) {
 		this.longitude = longitude;
 	}
 
-
-
-
 	@Override
 	  public String toString() {
-	    return "Location [user=" + userEmail + ", is in (" + longitude +","+ latitude + ")]";
+		String  t = "";
+		if(title !=null)
+			t= title;
+	    return "Location [title=" +t + ", is in (" + longitude +","+ latitude + ")]";
 	  }
 
+	public double distanceTo(Location myLocation) {
+		return Math.sqrt(Math.pow(longitude - myLocation.getLongitude(), 2) + 
+				Math.pow(latitude - myLocation.getLatitude(), 2) );
+		
+	}
 }
