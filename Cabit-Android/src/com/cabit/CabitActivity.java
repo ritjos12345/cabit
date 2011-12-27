@@ -181,7 +181,7 @@ public class CabitActivity extends MapActivity  {
 			    MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
                 final CabitRequest request = requestFactory.cabitRequest();
                 Log.i(TAG, "Sending request to server");
-                request.queryLocations().fire(	new Receiver<List<LocationProxy>>(){
+                request.getAllCabs().fire(	new Receiver<List<LocationProxy>>(){
                 	
 					@Override
 					public void onSuccess(List<LocationProxy> arg0) {
@@ -207,7 +207,7 @@ public class CabitActivity extends MapActivity  {
             		System.out.println("4");
 	            	for (LocationProxy locationProxy : result) {
 	            		System.out.println("5");
-	            		taxiOverlay.UpdateItem(locationProxy.getUserEmail(), locationProxy.getLatitude(), locationProxy.getLongitude(),locationProxy.getUserEmail(),"coool");
+	            		taxiOverlay.UpdateItem(locationProxy.getTitle(), locationProxy.getLatitude(), locationProxy.getLongitude(),locationProxy.getTitle(),"coool");
 	            		System.out.println("6");
 					}
             	}else{

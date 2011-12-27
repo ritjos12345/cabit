@@ -14,20 +14,25 @@ public class CabitService {
 	static DataStore db = new DataStore();
 	
 	@ServiceMethod
-	public String OrderCab(String cabName, Location from, Location to ) {
+	public String orderCab(String cabName, Location from, Location to ) {
 		Order ord = db.createOrder(Utils.getUserEmail(),cabName,from,to);
-		SendOrderToCab(ord);
+		sendOrderToCab(ord);
 		return ord.getCab();
 	}
 	
 	@ServiceMethod
-	public String OrderCab( Location from, Location to ) {
-		return OrderCab(db.findClosestCab(from).getTitle(),from,to);
+	public String orderCab( Location from, Location to ) {
+		return orderCab(db.findClosestCab(from).getTitle(),from,to);
 	}
 	
+	@ServiceMethod
+	public void confirmOrder( ) {
+		Order ord = db.findOrder(Utils.getUserEmail());
+		confirmClientOrder(ord);
+	}
 
 	@ServiceMethod
-	public void CancelOrder() {
+	public void cancelOrder() {
 		db.findOrder(Utils.getUserEmail());
 		// TODO send c2dm
 	}
@@ -36,9 +41,7 @@ public class CabitService {
 	public void updateMyLocation(Location location) {
 		db.updateMyLocation(location);
 	}
-	
 
-	
 	@ServiceMethod
 	public void deleteMyLocation() {
 		db.deleteMyLocation(Utils.getUserEmail());
@@ -48,15 +51,15 @@ public class CabitService {
 	public List<Location> getAllCabs() {
 		return db.findAllCabLocation();
 	}
-	
+	/*
 	@ServiceMethod
 	public List<Location> addressToLocation(String address) {
 		// TODO
 		return null;
 	}
+	*/
 	
-	
-	private void SendOrderToCab( Order order ){
+	private void sendOrderToCab( Order order ){
 		String message= "NEW_ORDER";
 		message+= "," + order.getUser();
 		message+= "," + order.getFrom();
@@ -64,26 +67,24 @@ public class CabitService {
 		Utils.sendC2DMUpdate(order.getCab(), message);
 	}
 	
-	private void CancelOrderToCab(String cabName,Order order){
+	private void cancelOrderToCab(String cabName,Order order){
 		String message= "CANCEL_ORDER";
 		message+= "," + order.getUser();
 		
 		Utils.sendC2DMUpdate(cabName, message);
 	}
 	
-	private void SendClientOrder(String cabName,Order order){
+	private void confirmClientOrder(Order order){
 		String message= "NEW_ORDER";
 		message+= "," + order.getCab();
 		message+= "," + order.getFrom();
 		message+= "," + order.getTo();
-		Utils.sendC2DMUpdate(cabName, message);
+		Utils.sendC2DMUpdate(order.getUser(), message);
 	}
 	
-	private void CancelClientOrder(String cabName,Order order){
+	private void cancelClientOrder(String cabName,Order order){
 		String message= "CANCEL_ORDER";
 		message+= "," + order.getCab();
 		Utils.sendC2DMUpdate(cabName, message);
 	}
-	
-   
 }

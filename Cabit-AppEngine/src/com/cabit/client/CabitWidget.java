@@ -118,8 +118,8 @@ public class CabitWidget extends Composite {
         messageProxy.setRecipient(recipient);
         messageProxy.setMessage(message);*/
         
-        Request<LocationProxy> sendRequest = request.readLocation("www.udi@gmail.com");
-        sendRequest.fire(new Receiver<LocationProxy>() {
+        //Request<LocationProxy> sendRequest = request.readLocation("www.udi@gmail.com");
+        /*sendRequest.fire(new Receiver<LocationProxy>() {
           @Override
           public void onFailure(ServerFailure error) {
             sendMessageButton.setEnabled(true);
@@ -133,10 +133,10 @@ public class CabitWidget extends Composite {
 			response.setLatitude(response.getLatitude()+add);
 			response.setLongitude(response.getLongitude()+add);
 			
-			request.updateLocation(response);
+			//request.updateLocation(response);
 			
 		}
-        });
+        });*/
       }
     });
 

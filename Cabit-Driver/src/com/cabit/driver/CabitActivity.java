@@ -159,7 +159,7 @@ public class CabitActivity extends MapActivity  {
     // Manage UI Screens
 
     private void setMainContent() {
-    	if(mapView ==null){
+    	
 	    	mapView = (MapView) findViewById(R.id.mapview);
 		    mapView.setBuiltInZoomControls(true);
 		    
@@ -179,7 +179,7 @@ public class CabitActivity extends MapActivity  {
 	
 	        // call convenience method that zooms map on our location
 	        
-    	}
+    	
     	myLocationOverlay.enableCompass();
     	myLocationOverlay.enableMyLocation();
     	myLocationOverlay.runOnFirstFix(new Runnable() {

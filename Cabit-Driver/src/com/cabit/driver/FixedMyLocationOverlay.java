@@ -99,7 +99,6 @@ public class FixedMyLocationOverlay extends MyLocationOverlay {
                         drawable.draw(canvas);
                 }
         }
-        
         @Override
         public synchronized void onLocationChanged(final Location location) {
         	super.onLocationChanged(location);
@@ -117,17 +116,8 @@ public class FixedMyLocationOverlay extends MyLocationOverlay {
 				@Override
 				protected LocationProxy doInBackground(Void... params) {
 					System.out.println("2");
-					request.updateLocation(loc).fire(new Receiver<LocationProxy>() {
-						@Override
-						public void onSuccess(LocationProxy arg0) {
-							System.out.println("4");
-							res = arg0;
-						}
-						public void onFailure(ServerFailure error) {
-							System.out.println("5");
-							res  = null;
-	                    }
-					});
+					request.updateMyLocation(loc).fire();
+					
 					System.out.println("6");
 					return res;
 				}

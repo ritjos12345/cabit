@@ -64,8 +64,5 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 		return true;
 	}
 	
-
-	
-	
 }
 
