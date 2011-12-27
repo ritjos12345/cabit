@@ -1,5 +1,6 @@
 package com.cabit.server;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.cabit.annotation.ServiceMethod;
@@ -49,7 +50,15 @@ public class CabitService {
 
 	@ServiceMethod
 	public List<Location> getAllCabs() {
+		/*LinkedList<Location> list = new LinkedList<Location>();
+		Location l = new Location();
+		l.setLatitude(33);
+		l.setLongitude(33);
+		l.setTitle("izik");
+		list.add(l);
+		return list;*/
 		return db.findAllCabLocation();
+		
 	}
 	/*
 	@ServiceMethod

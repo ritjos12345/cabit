@@ -15,5 +15,4 @@ public class CabitServiceLocator implements ServiceLocator {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

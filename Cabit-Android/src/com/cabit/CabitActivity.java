@@ -191,7 +191,7 @@ public class CabitActivity extends MapActivity  {
 					
 					@Override
                     public void onFailure(ServerFailure error) {
-						System.out.println("2");
+						System.out.println("2:"+error.getClass().getName() +" , "+error.getExceptionType()+", " + error.getMessage() + " , "+error.getStackTraceString());
                 		result = null;
                     }
                
