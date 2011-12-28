@@ -35,6 +35,15 @@ public class DataStore {
 		l.setTitle("www.udi@gmail.com");
 		map.put(l.getTitle(), l);
 		
+		
+		// TODO delete this 
+		Location x = new Location();
+		x.setLatitude((int) (33.5*1e6));
+		x.setLongitude((int) (34.5*1e6));
+		x.setTitle("itzikyacobi@gmail.com");
+		map.put(x.getTitle(), x);
+		
+		
 	}
 	
 	public Order createOrder(String user,String cab,Location from,Location to ){
