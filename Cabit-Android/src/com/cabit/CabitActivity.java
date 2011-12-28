@@ -22,15 +22,20 @@ import java.util.TimerTask;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.Button;
 
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.CabitRequest;
@@ -59,6 +64,8 @@ public class CabitActivity extends MapActivity  {
     private Context mContext = this;
     
     private MapView mapView;
+    
+    private Button buttonOrderEntry;
     
     private DynamicOverlay<String> taxiOverlay;
     
@@ -92,6 +99,8 @@ public class CabitActivity extends MapActivity  {
         }
     };
 
+   
+    
     /**
      * Begins the activity.
      */
@@ -101,10 +110,11 @@ public class CabitActivity extends MapActivity  {
         super.onCreate(savedInstanceState);
         
         
+        
         // Register a receiver to provide register/unregister notifications
         registerReceiver(mUpdateUIReceiver, new IntentFilter(Util.UPDATE_UI_INTENT));
         
-        
+        setContentView(R.layout.main);
     }
 
     @Override
@@ -120,7 +130,103 @@ public class CabitActivity extends MapActivity  {
         setScreenContent(R.layout.main); 
     }
 
-    
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+
+              final int  latitude = data.getExtras().getInt("latitude");
+              final int  longitude = data.getExtras().getInt("longitude");
+              final String address = data.getExtras().getString("address");
+              
+
+              LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+              final Location loc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+              final int myLatitude = 33;
+              final int myLongitude = 33;
+              //TODO fix this
+              /*if(loc != null){
+            	  myLatitude = (int) (loc.getLatitude()*1e6);
+            	  myLongitude= (int) (loc.getLongitude()*1e6);
+              }*/
+              new AlertDialog.Builder(this)
+	            .setMessage("Do you want to order a cab to \n"+address+" ?")
+	            .setTitle("Order a cab")
+	            .setCancelable(false)
+	            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                	   
+
+	                       
+	                	   new AsyncTask<Void, Void, String>() {
+	                           private String result;
+	                           
+	               			@Override
+	               			protected String doInBackground(Void... params) {
+	               			    MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
+	                               final CabitRequest request = requestFactory.cabitRequest();
+	                               Log.i(TAG, "Sending request to server");
+	                               
+	                               LocationProxy from = request.create(LocationProxy.class);
+	                               LocationProxy to = request.create(LocationProxy.class);
+	                               
+	                               to.setLatitude(latitude);
+	                               to.setLongitude(longitude);
+	                               to.setTitle(address);
+	                               
+	                               from.setLatitude(myLatitude);
+	                               from.setLongitude(myLongitude);
+	                               
+	                               request.orderCab(from, to).fire(new Receiver<String>(){
+	                               	
+	               					@Override
+	               					public void onSuccess(String arg0) {
+	               						System.out.println("1");
+	               						result = arg0;
+	               					}
+	               					
+	               					@Override
+	                                   public void onFailure(ServerFailure error) {
+	               						System.out.println("2:"+error.getClass().getName() +" , "+error.getExceptionType()+", " + error.getMessage() + " , "+error.getStackTraceString());
+	                               		result = null;
+	                                   }
+	                              
+	                               });
+	                                   
+	                               return result;
+	               			}
+	               			
+	               			@Override
+	                           protected void onPostExecute(String result) {
+	               				System.out.println("3");
+	                           	if(result!=null){
+	                           		new AlertDialog.Builder(mContext)
+		                          	  .setTitle("Order was created")
+		                          	  .setMessage("Waiting for :"+ result)
+		                          	  .show();  
+	                           	}else{
+	                           		new AlertDialog.Builder(mContext)
+		                          	  .setTitle("Order Error")
+		                          	  .setMessage("find cab to order.")
+		                          	  .show();  
+	                           	}
+	                               
+	                           }
+	               			
+
+	                       }.execute();
+	                   }
+	               })
+	               
+	            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	            		public void onClick(DialogInterface dialog, int id) {
+	            			
+	            		}
+	               })
+	             .show();           
+              
+            }
+        }
+  }
 
 	/**
      * Shuts down the activity.
@@ -144,27 +250,38 @@ public class CabitActivity extends MapActivity  {
 
     private void setHelloWorldScreenContent() {
     
+    	
         mapView = (MapView) findViewById(R.id.mapview);
 	    mapView.setBuiltInZoomControls(true);
 	    
 	    taxiOverlay = new DynamicOverlay<String>(this.getResources().getDrawable(R.drawable.taxi),mapView.getContext());
 	    mapView.getOverlays().add(taxiOverlay);
 	    
-	    Timer timer = new Timer();
+	   
 	    
-	    //UpdateTaxi();
-	    
+	    /*Timer timer = new Timer();
+	     
 	    class UpdateTaxiTask extends TimerTask {
     	   public void run() {
     		   UpdateTaxi();
     	   }
     	}
-	    final int FPS = 10;
+	    final int FPS = 30;
 	    TimerTask taxiTask = new UpdateTaxiTask();
 	    timer.scheduleAtFixedRate(taxiTask, 0, 1000*FPS);
+	    */
 	    
-	    
+	    buttonOrderEntry = (Button)findViewById(R.id.button_commit);
+        buttonOrderEntry.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				Intent intent = new Intent(CabitActivity.this, orderMenu.class); 
+				startActivityForResult(intent,1 );	
+			}
+		});
         
+        
+        UpdateTaxi();
     }
 
     private void UpdateTaxi() {
@@ -234,7 +351,7 @@ public class CabitActivity extends MapActivity  {
      * Sets the screen content based on the screen id.
      */
     private void setScreenContent(int screenId) {
-        setContentView(screenId);
+        
         switch (screenId) {
             case R.layout.main:
                 setHelloWorldScreenContent();

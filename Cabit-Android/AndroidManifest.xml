@@ -10,6 +10,10 @@
     <permission android:name="com.cabit.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
         
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    
     <uses-permission android:name="com.cabit.permission.C2D_MESSAGE" />
 
     <!-- Permission to register and receive data messages -->
@@ -64,5 +68,6 @@
                 <category android:name="com.cabit" />
             </intent-filter>
         </receiver>
+        <activity android:name=".orderMenu"></activity>
     </application>
 </manifest>

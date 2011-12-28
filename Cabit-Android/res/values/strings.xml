@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="all_white">#FFFFFF</color>
+    <color name="all_cyan">#89CFF0</color>
+    <color name="all_cyan2">#00CCCC</color>
+    
     <!-- Menu item text [CHAR LIMIT=NONE] -->
     <string name="accounts">Accounts</string>
 

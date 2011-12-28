@@ -30,8 +30,8 @@ public class DataStore {
 		
 		// TODO delete this 
 		Location l = new Location();
-		l.setLatitude(19240000);
-		l.setLongitude(-99120000);
+		l.setLatitude((int) (33*1e6));
+		l.setLongitude((int) (34*1e6));
 		l.setTitle("www.udi@gmail.com");
 		map.put(l.getTitle(), l);
 		
