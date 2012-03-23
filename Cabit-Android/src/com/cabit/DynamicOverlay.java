@@ -20,6 +20,7 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 		super(boundCenterBottom(defaultMarker));
 		this.hashMap = new HashMap<K, OverlayItem>();
 		this.context = context;
+		populate();
 	}
 
 	
@@ -28,7 +29,7 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 	}
 	
 	public void UpdateItem(K key, int latitudeE6,int longitudeE6 ,String title,String snippet){
-		UpdateItem(key, new GeoPoint(latitudeE6, longitudeE6),title,snippet);
+		UpdateItem(key, new GeoPoint (latitudeE6, longitudeE6),title,snippet);
 	}
 	
 	public void UpdateItem(K key, GeoPoint point,String title,String snippet){
@@ -37,7 +38,12 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 	
 	public void UpdateItem(K key, OverlayItem item){
 		hashMap.put(key, item);
+		
+	}
+
+	public void RefreshItems() {
 		populate();
+		
 	}
 	
 	@Override
@@ -63,6 +69,9 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 		dialog.show();
 		return true;
 	}
+
+
+
 	
 
 	

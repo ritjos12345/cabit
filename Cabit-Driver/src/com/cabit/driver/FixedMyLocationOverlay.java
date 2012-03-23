@@ -13,7 +13,7 @@ import android.os.AsyncTask;
 import com.cabit.client.MyRequestFactory;
 import com.cabit.driver.R;
 import com.cabit.shared.CabitRequest;
-import com.cabit.shared.LocationProxy;
+import com.cabit.shared.GpsLocationProxy;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
@@ -106,17 +106,17 @@ public class FixedMyLocationOverlay extends MyLocationOverlay {
         	
         	System.out.println("1");
         	
-        	new AsyncTask<Void, Void, LocationProxy>() {
+        	new AsyncTask<Void, Void, GpsLocationProxy>() {
         		MyRequestFactory requestFactory = Util.getRequestFactory(context, MyRequestFactory.class);
         		CabitRequest request = requestFactory.cabitRequest();
     	        
     	        
-        		LocationProxy loc = request.create(LocationProxy.class);
-        		LocationProxy res =null;
+        		GpsLocationProxy loc = request.create(GpsLocationProxy.class);
+        		GpsLocationProxy res =null;
 				@Override
-				protected LocationProxy doInBackground(Void... params) {
+				protected GpsLocationProxy doInBackground(Void... params) {
 					System.out.println("2");
-					request.updateMyLocation(loc).fire();
+					request.UpdateLocation(loc).fire();
 					
 					System.out.println("6");
 					return res;

@@ -5,95 +5,62 @@ import java.util.List;
 
 import com.cabit.annotation.ServiceMethod;
 
-/***
- * 
- * @author Udi
- *	This class is the business logic (the class that will be accessible from RPC )
- * 
- */
-public class CabitService {	
-	static DataStore db = new DataStore();
-	
-	@ServiceMethod
-	public String orderCab(String cabName, Location from, Location to ) {
-		Order ord = db.createOrder(Utils.getUserEmail(),cabName,from,to);
-		sendOrderToCab(ord);
-		return ord.getCab();
-	}
-	
-	@ServiceMethod
-	public String orderCab( Location from, Location to ) {
-		return orderCab(db.findClosestCab(from).getTitle(),from,to);
-	}
-	
-	@ServiceMethod
-	public void confirmOrder( ) {
-		Order ord = db.findOrder(Utils.getUserEmail());
-		confirmClientOrder(ord);
-	}
 
-	@ServiceMethod
-	public void cancelOrder() {
-		db.findOrder(Utils.getUserEmail());
-		// TODO send c2dm
-	}
-	
-	@ServiceMethod
-	public void updateMyLocation(Location location) {
-		db.updateMyLocation(location);
-	}
+public class CabitService {
 
+	// Taxi RPC functions
+	private int i ;
 	@ServiceMethod
-	public void deleteMyLocation() {
-		db.deleteMyLocation(Utils.getUserEmail());
-	}
-
-	@ServiceMethod
-	public List<Location> getAllCabs() {
-		/*LinkedList<Location> list = new LinkedList<Location>();
-		Location l = new Location();
-		l.setLatitude(33);
-		l.setLongitude(33);
-		l.setTitle("izik");
-		list.add(l);
-		return list;*/
-		return db.findAllCabLocation();
-		
-	}
-	/*
-	@ServiceMethod
-	public List<Location> addressToLocation(String address) {
-		// TODO
+	public TaxiStatus UpdateLocation(GpsLocation loc){
+		// TODO Auto-generated method stub
 		return null;
 	}
-	*/
 	
-	private void sendOrderToCab( Order order ){
-		String message= "NEW_ORDER";
-		message+= "," + order.getUser();
-		message+= "," + order.getFrom();
-		message+= "," + order.getTo();
-		Utils.sendC2DMUpdate(order.getCab(), message);
+	@ServiceMethod
+	public boolean UpdateOrder(int orderId,boolean except){
+		// TODO Auto-generated method stub
+		return true;
 	}
 	
-	private void cancelOrderToCab(String cabName,Order order){
-		String message= "CANCEL_ORDER";
-		message+= "," + order.getUser();
-		
-		Utils.sendC2DMUpdate(cabName, message);
+	
+	// User RPC functions
+	@ServiceMethod
+	public void IAmNeer(GpsLocation loc){
+		// TODO Auto-generated method stub
 	}
 	
-	private void confirmClientOrder(Order order){
-		String message= "NEW_ORDER";
-		message+= "," + order.getCab();
-		message+= "," + order.getFrom();
-		message+= "," + order.getTo();
-		Utils.sendC2DMUpdate(order.getUser(), message);
+	@ServiceMethod
+	public int CreateOrder(Address from, Address to){  // return the order id
+		// TODO Auto-generated method stub
+		return 1;
 	}
 	
-	private void cancelClientOrder(String cabName,Order order){
-		String message= "CANCEL_ORDER";
-		message+= "," + order.getCab();
-		Utils.sendC2DMUpdate(cabName, message);
+	@ServiceMethod
+	public int GetOrderStatus(int orderId){ // TODO fix this  should return List<Taxi,enum status>
+		// TODO Auto-generated method stub
+		return 1;
 	}
+	
+	@ServiceMethod
+	public Taxi GetTaxi(String driver){
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@ServiceMethod
+	public List<Taxi> GetAllTaxi(){
+		i=i+1 % 40;
+		LinkedList<Taxi> l  = new LinkedList<Taxi>();
+		GpsLocation g = new GpsLocation();
+		g.setLatitude((int) (  i*1e6)); // 33.5
+		g.setLongitude((int) (34.5*1e6));
+		Taxi t= new Taxi();
+		t.setDriver("udi2");
+		t.setGpsLocation(g);
+		l.add(t);
+		return l;
+	}
+	
+	
+	
 }
