@@ -36,7 +36,6 @@ import android.widget.Toast;
 import com.cabit.driver.R;
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.CabitRequest;
-import com.cabit.shared.LocationProxy;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
