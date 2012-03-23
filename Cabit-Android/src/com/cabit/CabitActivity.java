@@ -275,7 +275,8 @@ public class CabitActivity extends MapActivity  {
         buttonOrderEntry.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
-				Intent intent = new Intent(CabitActivity.this, orderMenu.class); 
+				//Intent intent = new Intent(CabitActivity.this, orderMenu.class); 
+				Intent intent = new Intent(CabitActivity.this,orderCabMenu.class);
 				startActivityForResult(intent,1 );	
 			}
 		});

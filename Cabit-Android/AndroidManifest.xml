@@ -69,5 +69,6 @@
             </intent-filter>
         </receiver>
         <activity android:name=".orderMenu"></activity>
+        <activity android:name=".orderCabMenu"></activity>
     </application>
 </manifest>
