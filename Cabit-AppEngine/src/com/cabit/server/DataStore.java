@@ -21,32 +21,25 @@ public class DataStore {
 	private static final Logger log = Logger.getLogger(DataStore.class.getName());
 	
 	
-	private HashMap<String,Location> map;
+	private HashMap<String,GpsLocation> map;
 	private List<Order> orders;
 	
-	public DataStore() {
-		map = new HashMap<String, Location>();
+	/*	public DataStore() {
+		
+	
+		map = new HashMap<String, GpsLocation>();
 		orders = new LinkedList<Order>();
 		
 		// TODO delete this 
-		Location l = new Location();
-		l.setLatitude((int) (33*1e6));
-		l.setLongitude((int) (34*1e6));
-		l.setTitle("www.udi@gmail.com");
+		GpsLocation l = new GpsLocation();
+		l.setLatitude((int) (32*1e6));
+		l.setLongitude((int) (35*1e6));
+		l.setTitle("itzikyacobi@gmail.com");
 		map.put(l.getTitle(), l);
-		
-		
-		// TODO delete this 
-		Location x = new Location();
-		x.setLatitude((int) (33.5*1e6));
-		x.setLongitude((int) (34.5*1e6));
-		x.setTitle("itzikyacobi@gmail.com");
-		map.put(x.getTitle(), x);
-		
 		
 	}
 	
-	public Order createOrder(String user,String cab,Location from,Location to ){
+	public Order createOrder(String user,String cab,GpsLocation from,GpsLocation to ){
 		Order order = new Order();
 		orders.add( order);
 		order.setUser(user);
@@ -65,14 +58,14 @@ public class DataStore {
 		return null;
 	}
 	
-	public Location updateMyLocation(Location location) {
+	public GpsLocation updateMyLocation(GpsLocation location) {
 		String cabName = Utils.getUserEmail();
 		location.setTitle(cabName);
 		map.put(cabName, location);
 		return location;
 	}
 	
-	public Location findCabLocation(String cab) {
+	public GpsLocation findCabLocation(String cab) {
 		return map.get(cab);
 	}
 
@@ -80,20 +73,20 @@ public class DataStore {
 		map.remove(cab);
 	}
 
-	public List<Location> findAllCabLocation() {
-		List<Location> list = new LinkedList<Location>();
-		for (Location location : map.values()) {
+	public List<GpsLocation> findAllCabLocation() {
+		List<GpsLocation> list = new LinkedList<GpsLocation>();
+		for (GpsLocation location : map.values()) {
 			list.add(location); 
 		} 
 		return list;
 	}
 	
 	// Can return null in case there are no cabs!
-	public Location findClosestCab(Location myLocation ) {
+	public GpsLocation findClosestCab(GpsLocation myLocation ) {
 		
-		Location bestCab = null;
+		GpsLocation bestCab = null;
 		double min = 0; 
-		for (Location location : map.values()) {
+		for (GpsLocation location : map.values()) {
 			double tmp = location.distanceTo(myLocation);
 			if(bestCab == null || tmp <=min){
 				min = tmp;
@@ -102,7 +95,7 @@ public class DataStore {
 		} 
 		return bestCab;
 	}
-	
+*/	
 	
 
 }

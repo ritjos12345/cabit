@@ -22,16 +22,15 @@ import com.google.web.bindery.requestfactory.shared.RequestFactory;
 import com.google.web.bindery.requestfactory.shared.ServiceName;
 
 import com.cabit.client.MyRequestFactory.RegistrationInfoRequest;
+
 import com.cabit.shared.CabitRequest;
-import com.cabit.shared.LocationProxy;
 import com.cabit.shared.RegistrationInfoProxy;
 /***
  * 
  * @author Udi
  *
  */
-public interface MyRequestFactory extends RequestFactory  {
-
+public interface MyRequestFactory extends RequestFactory {
 
 	@ServiceName("com.cabit.server.RegistrationInfo")
 	public interface RegistrationInfoRequest extends RequestContext {
@@ -46,12 +45,9 @@ public interface MyRequestFactory extends RequestFactory  {
 		InstanceRequest<RegistrationInfoProxy, Void> unregister();
 	}
 
+	RegistrationInfoRequest registrationInfoRequest();
 
-	
 	CabitRequest cabitRequest();
 
 
-
-	RegistrationInfoRequest registrationInfoRequest();
-	
 }

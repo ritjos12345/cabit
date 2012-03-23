@@ -15,6 +15,7 @@
  */
 package com.cabit;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,7 +40,8 @@ import android.widget.Button;
 
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.CabitRequest;
-import com.cabit.shared.LocationProxy;
+import com.cabit.shared.GpsLocationProxy;
+import com.cabit.shared.TaxiProxy;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -166,7 +168,7 @@ public class CabitActivity extends MapActivity  {
 	                               final CabitRequest request = requestFactory.cabitRequest();
 	                               Log.i(TAG, "Sending request to server");
 	                               
-	                               LocationProxy from = request.create(LocationProxy.class);
+	                               /*LocationProxy from = request.create(LocationProxy.class);
 	                               LocationProxy to = request.create(LocationProxy.class);
 	                               
 	                               to.setLatitude(latitude);
@@ -191,7 +193,7 @@ public class CabitActivity extends MapActivity  {
 	                                   }
 	                              
 	                               });
-	                                   
+	                               */    
 	                               return result;
 	               			}
 	               			
@@ -254,22 +256,13 @@ public class CabitActivity extends MapActivity  {
         mapView = (MapView) findViewById(R.id.mapview);
 	    mapView.setBuiltInZoomControls(true);
 	    
+	    // TODO udi1
 	    taxiOverlay = new DynamicOverlay<String>(this.getResources().getDrawable(R.drawable.taxi),mapView.getContext());
 	    mapView.getOverlays().add(taxiOverlay);
 	    
 	   
 	    
-	    /*Timer timer = new Timer();
-	     
-	    class UpdateTaxiTask extends TimerTask {
-    	   public void run() {
-    		   UpdateTaxi();
-    	   }
-    	}
-	    final int FPS = 30;
-	    TimerTask taxiTask = new UpdateTaxiTask();
-	    timer.scheduleAtFixedRate(taxiTask, 0, 1000*FPS);
-	    */
+	    
 	    
 	    buttonOrderEntry = (Button)findViewById(R.id.button_commit);
         buttonOrderEntry.setOnClickListener(new View.OnClickListener() {
@@ -281,28 +274,34 @@ public class CabitActivity extends MapActivity  {
 		});
         
         
-        UpdateTaxi();
+        Timer timer = new Timer();
+	     
+	    int FPS = 12;
+	    timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				UpdateTaxi();
+				
+			}
+		},0,1000*FPS);  
     }
 
     private void UpdateTaxi() {
-
+    	
         // Use an AsyncTask to avoid blocking the UI thread
-        new AsyncTask<Void, Void, List<LocationProxy>>() {
-            private List<LocationProxy> result;
-
-
-                        
+        new AsyncTask<Void, Void, List<TaxiProxy>>() {
+            private List<TaxiProxy> result;
+            
             
 			@Override
-			protected List<LocationProxy> doInBackground(Void... params) {
+			protected List<TaxiProxy> doInBackground(Void... params) {
 			    MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
                 final CabitRequest request = requestFactory.cabitRequest();
                 Log.i(TAG, "Sending request to server");
-                request.getAllCabs().fire(	new Receiver<List<LocationProxy>>(){
+                request.GetAllTaxi().fire(	new Receiver<List<TaxiProxy>>(){
                 	
 					@Override
-					public void onSuccess(List<LocationProxy> arg0) {
-						System.out.println("1");
+					public void onSuccess(List<TaxiProxy> arg0) {
 						result = arg0;
 					}
 					
@@ -311,29 +310,24 @@ public class CabitActivity extends MapActivity  {
 						System.out.println("2:"+error.getClass().getName() +" , "+error.getExceptionType()+", " + error.getMessage() + " , "+error.getStackTraceString());
                 		result = null;
                     }
-               
                 });
-                    
                 return result;
 			}
 			
 			@Override
-            protected void onPostExecute(List<LocationProxy> result) {
-				System.out.println("3");
+            protected void onPostExecute(List<TaxiProxy> result) {
+				
+				
             	if(result!=null){
-            		System.out.println("4");
-	            	for (LocationProxy locationProxy : result) {
-	            		System.out.println("5");
-	            		taxiOverlay.UpdateItem(locationProxy.getTitle(), locationProxy.getLatitude(), locationProxy.getLongitude(),locationProxy.getTitle(),"coool");
-	            		System.out.println("6");
+	            	for (TaxiProxy taxiProxy : result) {
+	            		taxiOverlay.UpdateItem(taxiProxy.getDriver(), (int )taxiProxy.getGpsLocation().getLatitude(), (int) taxiProxy.getGpsLocation().getLatitude(), taxiProxy.getDriver(),"coool");
 					}
+	            	taxiOverlay.RefreshItems();
             	}else{
-            		System.out.println("7");
             		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             		
             		dialog.setTitle("Error");
             		dialog.setMessage("recive null pointer from the server..");
-            		System.out.println("8");
             		dialog.show();
             		System.out.println("9");
             	}
@@ -342,7 +336,7 @@ public class CabitActivity extends MapActivity  {
 			
 
         }.execute();
-        System.out.println("10");
+
         
 		
 	}
@@ -351,7 +345,6 @@ public class CabitActivity extends MapActivity  {
      * Sets the screen content based on the screen id.
      */
     private void setScreenContent(int screenId) {
-        
         switch (screenId) {
             case R.layout.main:
                 setHelloWorldScreenContent();
@@ -361,7 +354,6 @@ public class CabitActivity extends MapActivity  {
 
 	@Override
 	protected boolean isRouteDisplayed() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
