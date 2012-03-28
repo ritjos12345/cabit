@@ -1,32 +1,40 @@
 package com.cabit;
 
 
-
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cabit.client.MyRequestFactory;
+import com.cabit.shared.AddressProxy;
+import com.cabit.shared.CabitRequest;
+import com.cabit.shared.GpsLocationProxy;
+import com.cabit.shared.TaxiProxy;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import android.os.AsyncTask;
 import android.app.Activity;
-import android.app.Dialog;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
 
 public class orderCabMenu extends Activity{
 	EditText editTextSearch;
@@ -36,6 +44,7 @@ public class orderCabMenu extends Activity{
 	ProgressThread progressThread;
 	List<Address> destAdresses;
 	final int PROGRESS_HORIZONTAL_DIALOG_ID = 1;
+	int orderId;
 	
     /** Called when the activity is first created. */
     @Override
@@ -48,6 +57,12 @@ public class orderCabMenu extends Activity{
         editTextSearch = (EditText) findViewById(R.id.edit_text_search);
         dests = new ArrayList<String>();
         
+        // initalize the gps systems we would use afterwards
+        final LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        Criteria crit = new Criteria();
+        crit.setAccuracy(Criteria.ACCURACY_FINE);
+        final String provider = lm.getBestProvider(crit, true);
+        
         buttonCommit.setOnClickListener(new View.OnClickListener() {	
         	public void onClick(View v) {
 	
@@ -59,7 +74,7 @@ public class orderCabMenu extends Activity{
 					return;
 				}
 				
-				// search for the correct title of the dest
+				// search for the correct title of the dst using editTextSearch.getText().toString() as the search val
 				Geocoder g = new Geocoder(getBaseContext());
 			    String locationName = editTextSearch.getText().toString(); 
 			    try {
@@ -84,27 +99,47 @@ public class orderCabMenu extends Activity{
 					e.printStackTrace();
 				}
 				
+			    // update the vals at dests arraylist
 				dests.add(new String(editTextSearch.getText().toString()));
-				// connect to the server using editTextSearch.getText().toString() as the search val
-				// update the vals at dests arraylist
 				
+				// connect the server and tell it searching a cab soon
+				new AsyncTask<Void, Void, Void>() {
 
-				// this are fake values that we retrieve from google api 
-        		//dests.add("vvv");
-                //dests.add("gg");
-				
+					@Override
+					protected Void doInBackground(Void... params) {
+					    MyRequestFactory requestFactory = 
+					    		Util.getRequestFactory(getBaseContext(), MyRequestFactory.class);
+		                final CabitRequest request = requestFactory.cabitRequest();
+		                Log.i("orderCabMenu", 
+		                		"telling the server that client soon will order a cab");
+		                
+		                // ask about the current gps locatoin
+		                Location loc = lm.getLastKnownLocation(provider);
+		                
+		                GpsLocationProxy myGpsLoc = request.create(GpsLocationProxy.class);
+		                //myGpsLoc.setLatitude((int) (33.5*1e6));
+		                //myGpsLoc.setLongitude((int) (34.5*1e6));
+		                
+		                // get the current gps pos details 
+		                myGpsLoc.setLatitude((long) loc.getLatitude());
+		                myGpsLoc.setLongitude((long) loc.getLongitude());
+		                
+		                request.IAmNeer(myGpsLoc).fire();
+		                
+		                return null;
+					}
+					
+		       	}.execute();
+	
 				// open the search dialog
 				registerForContextMenu(v);
 				openContextMenu(v);
-				
-				// connect to the server using editTextSearch.getText().toString() as the search val
         	}
 		});
         buttonCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				finish();
 				dests.clear();
-				//dests.add("ss");
 			}
         });
     }
@@ -121,7 +156,8 @@ public class orderCabMenu extends Activity{
     }
     
 	public boolean onContextItemSelected(MenuItem item) {
-		int index = item.getItemId();
+		final int index = item.getItemId();
+		final String srcTitle = "";
 		
 		/*super.onContextItemSelected(item);
         AdapterView.AdapterContextMenuInfo menuInfo;
@@ -134,16 +170,67 @@ public class orderCabMenu extends Activity{
 		}
 		else{
 			
-			Intent resultData = new Intent();
+			/*Intent resultData = new Intent();
 			resultData.putExtra("address", dests.get(index));
-	        resultData.putExtra("latitude", (int)(destAdresses.get(0).getLatitude()*1e6));
-	        resultData.putExtra("longitude",(int)(destAdresses.get(0).getLongitude()*1e6));
+	        resultData.putExtra("latitude", (int)(destAdresses.get(index).getLatitude()*1e6));
+	        resultData.putExtra("longitude",(int)(destAdresses.get(index).getLongitude()*1e6));
+			*/
 			
-	        Toast.makeText(orderCabMenu.this,
-	        		"Connecting to the server to"+dests.get(index),
+	        Toast.makeText(orderCabMenu.this,"Connecting to the server to"+dests.get(index),
 	        		Toast.LENGTH_LONG).show();
 			System.out.println(dests.get(index));
-	        
+			
+			// updating the server about the cab to search
+			new AsyncTask<Void, Void, Integer>() {
+	            Integer result = new Integer(0);
+	            
+				@Override
+				protected Integer doInBackground(Void... params) {
+				    MyRequestFactory requestFactory = Util.getRequestFactory(getBaseContext(), MyRequestFactory.class);
+	                final CabitRequest request = requestFactory.cabitRequest();
+	                Log.i("orderCabMenu", "Sending request details to server");
+	                
+	                // create the dests proxy vals
+	                AddressProxy mySrc = request.create(AddressProxy.class);
+	                mySrc.setTitle(srcTitle);
+	                AddressProxy myDst = request.create(AddressProxy.class);
+	                myDst.setTitle(dests.get(index));
+	                
+	                Log.i("orderCabMenu", "Src "+mySrc.getTitle()+" dest "+myDst.getTitle());
+	                
+	                // fire the order
+	                request.CreateOrder(mySrc,myDst).fire(new Receiver<Integer>() {
+	                	@Override
+						public void onSuccess(Integer arg0) {
+							result = arg0;
+						}
+						
+						@Override
+	                    public void onFailure(ServerFailure error) {
+							System.out.println("2:"+error.getClass().getName() +" , "+error.getExceptionType()+", " + error.getMessage() + " , "+error.getStackTraceString());
+	                		result = null;
+	                    }
+					});
+	                return result;
+				}
+				
+				@Override
+	            protected void onPostExecute(Integer result) {
+	            	if(result!=null){
+		            	orderId = result;
+		            	Log.i("orderCabMenu", "The order is "+result);
+		            	// start updating the user about the order status
+		            	progressThread.setState(1);
+		            	Toast.makeText(orderCabMenu.this,"order id is "+result+" searching for a cab",
+	        	        		Toast.LENGTH_LONG).show();
+	            	}else{
+	            		Toast.makeText(orderCabMenu.this,"recive null pointer from the server..",
+	        	        		Toast.LENGTH_LONG).show();
+	            	}
+	            }
+				
+	        }.execute();
+			
 			/*ProgressDialog.show(this,"מחפש נהגי מונית","טוען...נא להמתין", false,true,new DialogInterface.OnCancelListener(){
                 public void onCancel(DialogInterface dialog){
                 	Toast.makeText(orderMenu.this,"Action is cancelled",Toast.LENGTH_LONG).show();
@@ -163,12 +250,12 @@ public class orderCabMenu extends Activity{
 		        }
 		       });
 			
+	    	
 			showDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
 			// start a progress thread
-			progressThread = new ProgressThread(handler);
+			progressThread = new ProgressThread(handler,getBaseContext());
             progressThread.start();
 		}
-		
 		return true;
 	}
 	
