@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" 
+    android:orientation="vertical"
+    android:background="@color/all_white">
+
+    <TextView    
+    		android:id="@+id/top_title"
+    		android:padding="10dip"
+    		android:textSize="22sp"
+           android:layout_width="match_parent"                 
+           android:layout_height="wrap_content"
+           android:textColor="@color/all_cyan" android:text="ordering a new cab"/>
+    
+    
+     <TextView    
+         		android:id="@+id/textview_name_title"
+         		android:padding="10dip"
+         		android:textSize="16sp"
+                android:layout_width="wrap_content"                 
+                android:layout_height="wrap_content"
+                android:text="enter your dest"
+                android:textColor="@color/all_cyan"
+    			android:layout_marginLeft="10px"/>
+    
+    <EditText    
+    		android:id="@+id/edit_text_search"
+           android:layout_width="match_parent"                 
+           android:layout_height="wrap_content"
+           android:layout_marginLeft="20px"/>
+    
+    <TableRow android:id="@+id/tableRow1" 
+        android:layout_height="wrap_content" 
+        android:layout_width="wrap_content" 
+        android:layout_gravity="center">
+        
+        <Button android:layout_gravity="center_horizontal" 
+            android:layout_width="wrap_content" 
+            android:text="cancel" 
+            android:id="@+id/button_cancel" 
+            android:layout_height="wrap_content"></Button>
+        <Button android:layout_gravity="center_horizontal" 
+            android:layout_width="wrap_content" 
+            android:text="search" 
+            android:id="@+id/button_commit" 
+            android:layout_height="wrap_content"></Button>
+    </TableRow>
+ 
+</LinearLayout>
+
