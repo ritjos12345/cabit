@@ -4,6 +4,7 @@ package com.cabit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.AddressProxy;
@@ -44,6 +45,8 @@ public class orderCabMenu extends Activity{
 	ProgressThread progressThread;
 	List<Address> destAdresses;
 	final int PROGRESS_HORIZONTAL_DIALOG_ID = 1;
+	String provider;
+	LocationManager lm;
 	int orderId;
 	
     /** Called when the activity is first created. */
@@ -58,10 +61,10 @@ public class orderCabMenu extends Activity{
         dests = new ArrayList<String>();
         
         // initalize the gps systems we would use afterwards
-        final LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         Criteria crit = new Criteria();
         crit.setAccuracy(Criteria.ACCURACY_FINE);
-        final String provider = lm.getBestProvider(crit, true);
+        provider = lm.getBestProvider(crit, true);
         
         buttonCommit.setOnClickListener(new View.OnClickListener() {	
         	public void onClick(View v) {
@@ -93,13 +96,11 @@ public class orderCabMenu extends Activity{
 						dests.add(str.toString());
 					}	
 			        
-			    } catch (IOException e) {
-					// TODO Auto-generated catch block
-			    	System.out.println("a5 "+e.getMessage());
-					e.printStackTrace();
+			    } catch (Exception e) {
+			    	Log.e("orderCabMenu", "couldn't get to the google server");
 				}
 				
-			    // update the vals at dests arraylist
+			    // add the search dest to the dests list
 				dests.add(new String(editTextSearch.getText().toString()));
 				
 				// connect the server and tell it searching a cab soon
@@ -117,13 +118,21 @@ public class orderCabMenu extends Activity{
 		                Location loc = lm.getLastKnownLocation(provider);
 		                
 		                GpsLocationProxy myGpsLoc = request.create(GpsLocationProxy.class);
-		                //myGpsLoc.setLatitude((int) (33.5*1e6));
-		                //myGpsLoc.setLongitude((int) (34.5*1e6));
 		                
 		                // get the current gps pos details 
-		                myGpsLoc.setLatitude((long) loc.getLatitude());
-		                myGpsLoc.setLongitude((long) loc.getLongitude());
+		                try{
+		                	myGpsLoc.setLatitude((long) loc.getLatitude());
+			                myGpsLoc.setLongitude((long) loc.getLongitude());
+		                }
+		                catch(Exception e){
+		                	// in case that couldn't retrieve the gps location, set fake pos
+		                	myGpsLoc.setLatitude((int) (33.5*1e6));
+			                myGpsLoc.setLongitude((int) (34.5*1e6));
+		                }
 		                
+		                Log.i("orderCabMenu", 
+		                		myGpsLoc.getLatitude() + " " + myGpsLoc.getLongitude());
+		                // send the request
 		                request.IAmNeer(myGpsLoc).fire();
 		                
 		                return null;
@@ -138,8 +147,8 @@ public class orderCabMenu extends Activity{
 		});
         buttonCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				finish();
 				dests.clear();
+				finish();
 			}
         });
     }
@@ -166,19 +175,12 @@ public class orderCabMenu extends Activity{
 		
 		if (index==dests.size()){
 			// means, choosing the cancel opt
-			System.out.println("baaa");
+			Log.i("orderCabMenu", "ordering a cab was canceled");
 		}
 		else{
 			
-			/*Intent resultData = new Intent();
-			resultData.putExtra("address", dests.get(index));
-	        resultData.putExtra("latitude", (int)(destAdresses.get(index).getLatitude()*1e6));
-	        resultData.putExtra("longitude",(int)(destAdresses.get(index).getLongitude()*1e6));
-			*/
-			
-	        Toast.makeText(orderCabMenu.this,"Connecting to the server to"+dests.get(index),
+	        Toast.makeText(orderCabMenu.this,"searching for a cab to "+dests.get(index),
 	        		Toast.LENGTH_LONG).show();
-			System.out.println(dests.get(index));
 			
 			// updating the server about the cab to search
 			new AsyncTask<Void, Void, Integer>() {
@@ -196,6 +198,33 @@ public class orderCabMenu extends Activity{
 	                AddressProxy myDst = request.create(AddressProxy.class);
 	                myDst.setTitle(dests.get(index));
 	                
+	                // find the current pos details
+	                Location loc = lm.getLastKnownLocation(provider);   
+                    String address = "";
+                    Geocoder geoCoder = null;
+                    geoCoder = new Geocoder(getBaseContext());
+                    // geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
+                    
+                    try {
+                    	Log.i("orderCabMenu","/////"+loc.getAltitude()+","+loc.getLatitude());
+                    	List<Address> addresses = geoCoder.getFromLocation(
+                        loc.getAltitude(),loc.getLatitude(),1);
+                      if (addresses.size()>0) {
+                        for (int index = 0; 
+                        		index < addresses.get(0).getMaxAddressLineIndex();
+                        		index++)
+                          address += addresses.get(0).getAddressLine(index) + " ";
+                      }
+                      else{
+                    	  Log.e("orderCabMenu", "couldn't find the adress");
+                      }
+                    }
+                    catch (Exception e) { 
+                    	Log.e("orderCabMenu", "bad gps location");
+                    }   
+	                
+                    mySrc.setTitle(address);
+	                
 	                Log.i("orderCabMenu", "Src "+mySrc.getTitle()+" dest "+myDst.getTitle());
 	                
 	                // fire the order
@@ -207,7 +236,9 @@ public class orderCabMenu extends Activity{
 						
 						@Override
 	                    public void onFailure(ServerFailure error) {
-							System.out.println("2:"+error.getClass().getName() +" , "+error.getExceptionType()+", " + error.getMessage() + " , "+error.getStackTraceString());
+							Log.e("orderCabMenu",error.getClass().getName()+", "
+									+error.getExceptionType()+", "+error.getMessage()
+									+", "+error.getStackTraceString());
 	                		result = null;
 	                    }
 					});
@@ -219,8 +250,10 @@ public class orderCabMenu extends Activity{
 	            	if(result!=null){
 		            	orderId = result;
 		            	Log.i("orderCabMenu", "The order is "+result);
-		            	// start updating the user about the order status
+		            	// update the progress thread to start asking about the order state 
 		            	progressThread.setState(1);
+		            	progressThread.setOrderId(orderId);
+		            	progressDialog.setMessage("searching for a fitting cab");
 		            	Toast.makeText(orderCabMenu.this,"order id is "+result+" searching for a cab",
 	        	        		Toast.LENGTH_LONG).show();
 	            	}else{
@@ -239,7 +272,8 @@ public class orderCabMenu extends Activity{
 			
 			progressDialog= new ProgressDialog(this);
 	    	progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-	    	progressDialog.setMessage("searching for a fitting cab");
+	    	//progressDialog.setMessage("searching for a fitting cab");
+	    	progressDialog.setMessage("posting the order");
 	    	progressDialog.setCancelable(false);
 	    	progressDialog.setIndeterminate(false);
 	    	progressDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "cancel",new DialogInterface.OnClickListener() {
@@ -249,12 +283,11 @@ public class orderCabMenu extends Activity{
 		        	   progressThread.setState(0);
 		        }
 		       });
-			
 	    	
-			showDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
-			// start a progress thread
+	    	// start a progress thread
 			progressThread = new ProgressThread(handler,getBaseContext());
             progressThread.start();
+			showDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
 		}
 		return true;
 	}
@@ -289,6 +322,7 @@ public class orderCabMenu extends Activity{
            
             // if finished talking with the server 
             if (total >= 100){
+            //if (total >= 1000){
                 //dismissDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
                 progressDialog.dismiss();
                 progressThread.setState(ProgressThread.STATE_DONE);
