@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.cabit;
+package com.cabit.utils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -32,8 +32,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 
+import com.cabit.AndroidRequestTransport;
+import com.cabit.R;
+import com.cabit.Setup;
+import com.cabit.R.drawable;
 import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.google.web.bindery.requestfactory.shared.RequestFactory;
 import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
@@ -240,5 +247,17 @@ public class Util {
      */
     private static String getPackageName() {
         return Util.class.getPackage().getName();
+    }
+    
+    public static Location GetMyLocation(Context context){
+    	// initalize the gps systems we would use afterwards
+    	
+    	LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria crit = new Criteria();
+        crit.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider = lm.getBestProvider(crit, true);
+        
+    	return lm.getLastKnownLocation(provider);
+    	
     }
 }

@@ -1,4 +1,4 @@
-package com.cabit;
+package com.cabit.utils;
 
 import java.util.HashMap;
 
@@ -13,13 +13,13 @@ import android.location.Location;
 
 public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 	
-	HashMap<K, OverlayItem> hashMap;
-	Context context;
+	protected HashMap<K, OverlayItem> hashMap;
+	protected Context mContext;
 	
 	public DynamicOverlay(Drawable defaultMarker, Context context) {
 		super(boundCenterBottom(defaultMarker));
 		this.hashMap = new HashMap<K, OverlayItem>();
-		this.context = context;
+		this.mContext = context;
 		populate();
 	}
 
@@ -58,7 +58,7 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 	@Override
 	protected boolean onTap(int index) {
 	  OverlayItem item = createItem(index);
-	  return  OnItemSelected(item ,context );
+	  return  OnItemSelected(item ,mContext );
 	}
 	
 	public boolean OnItemSelected(OverlayItem item, Context context ){

@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.cabit.R;
+import com.cabit.R.id;
+import com.cabit.R.layout;
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.GpsAddressProxy;
 import com.cabit.shared.CabitRequest;
 import com.cabit.shared.GpsLocationProxy;
 import com.cabit.shared.TaxiProxy;
+import com.cabit.utils.Util;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import android.os.AsyncTask;
@@ -38,6 +42,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class orderCabMenu extends Activity{
+	
+	private static final String TAG = "orderCabMenu";
+	private Context mContext = this;
+	
 	EditText editTextSearch;
 	Button buttonCommit,buttonCancel; 
 	ArrayList<String> dests;
@@ -45,8 +53,8 @@ public class orderCabMenu extends Activity{
 	ProgressThread progressThread;
 	List<Address> destAdresses;
 	final int PROGRESS_HORIZONTAL_DIALOG_ID = 1;
-	String provider;
-	LocationManager lm;
+	
+	
 	int orderId;
 	
     /** Called when the activity is first created. */
@@ -60,11 +68,7 @@ public class orderCabMenu extends Activity{
         editTextSearch = (EditText) findViewById(R.id.edit_text_search);
         dests = new ArrayList<String>();
         
-        // initalize the gps systems we would use afterwards
-        lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-        Criteria crit = new Criteria();
-        crit.setAccuracy(Criteria.ACCURACY_FINE);
-        provider = lm.getBestProvider(crit, true);
+        
         
         buttonCommit.setOnClickListener(new View.OnClickListener() {	
         	public void onClick(View v) {
@@ -115,7 +119,7 @@ public class orderCabMenu extends Activity{
 		                		"telling the server that client soon will order a cab");
 		                
 		                // ask about the current gps locatoin
-		                Location loc = lm.getLastKnownLocation(provider);
+		                Location loc = Util.GetMyLocation(mContext);
 		                
 		                GpsLocationProxy myGpsLoc = request.create(GpsLocationProxy.class);
 		                
@@ -199,7 +203,8 @@ public class orderCabMenu extends Activity{
 	                myDst.setTitle(dests.get(index));
 	                
 	                // find the current pos details
-	                Location loc = lm.getLastKnownLocation(provider);   
+	                Location loc = Util.GetMyLocation(mContext);
+	                
                     String address = "";
                     Geocoder geoCoder = null;
                     geoCoder = new Geocoder(getBaseContext());

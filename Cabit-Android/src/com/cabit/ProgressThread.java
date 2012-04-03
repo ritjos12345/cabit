@@ -2,6 +2,7 @@ package com.cabit;
 
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.CabitRequest;
+import com.cabit.utils.Util;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 
