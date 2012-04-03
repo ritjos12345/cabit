@@ -39,10 +39,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.cabit.R;
+import com.cabit.R.drawable;
+import com.cabit.R.id;
+import com.cabit.R.layout;
 import com.cabit.client.MyRequestFactory;
 import com.cabit.shared.CabitRequest;
 import com.cabit.shared.GpsLocationProxy;
 import com.cabit.shared.TaxiProxy;
+import com.cabit.utils.DynamicOverlay;
+import com.cabit.utils.DynamicOverlayMyLocation;
+import com.cabit.utils.DynamicOverlayOneTaxi;
+import com.cabit.utils.Util;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -54,12 +62,15 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
  */
 public class TrackTaxiActivity extends MapActivity {
  	/** Called when the activity is first created. */
-	protected MapView mapView; 
-	protected DynamicOverlay<String> taxiOverlay ;
-	protected Context mContext = this;
 	
-	protected static final String TAG = "TrackTaxiActivity";
-	private String myTaxiName;
+	private static final String TAG = "TrackTaxiActivity";
+	private Context mContext = this;
+	
+	
+	protected MapView mapView; 
+	protected DynamicOverlayOneTaxi oneTaxiOverlay ;
+	protected DynamicOverlayMyLocation myLocationOverlay ;
+	protected String myTaxiName;
 	
 	/** Called when the activity is first created. */
     @Override
@@ -72,69 +83,21 @@ public class TrackTaxiActivity extends MapActivity {
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         
-        taxiOverlay = new DynamicOverlay<String>(this.getResources()
-				.getDrawable(R.drawable.taxi), mapView.getContext());
-		mapView.getOverlays().add(taxiOverlay);
-		
-		Bundle extras = getIntent().getExtras();
+        Bundle extras = getIntent().getExtras();
 		if(extras !=null) {
 			myTaxiName = extras.getString("taxi");
 		}
 		
+        oneTaxiOverlay = new DynamicOverlayOneTaxi(this.getResources().getDrawable(R.drawable.taxi), mapView , myTaxiName);
+		mapView.getOverlays().add(oneTaxiOverlay);
+		oneTaxiOverlay.Start(10);
 		
-		Timer timer = new Timer();
-		int FPS = 12;
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				UpdateTaxi();
-
-			}
-		}, 0, 1000 * FPS);
+		myLocationOverlay =new DynamicOverlayMyLocation(this.getResources().getDrawable(R.drawable.dot), mapView, false);
+		mapView.getOverlays().add(myLocationOverlay);
+		myLocationOverlay.start();
+		
     }
     
-    private void UpdateTaxi() {
-		// Use an AsyncTask to avoid blocking the UI thread
-		new AsyncTask<Void, Void, TaxiProxy>() {
-			private TaxiProxy result;
-
-			@Override
-			protected TaxiProxy doInBackground(Void... params) {
-				MyRequestFactory requestFactory = Util.getRequestFactory( mContext, MyRequestFactory.class);
-				final CabitRequest request = requestFactory.cabitRequest();
-				Log.i(TAG, "Sending getTaxi request to server"); 
-				request.GetTaxi(myTaxiName).fire(new Receiver<TaxiProxy>() {
-					@Override
-					public void onSuccess(TaxiProxy arg0) {
-						result = arg0;
-					}
-					@Override
-					public void onFailure(ServerFailure error) {
-						result = null;
-					}
-				});
-				return result;
-			}
-
-			@Override
-			protected void onPostExecute(TaxiProxy result) {
-				if (result != null) {
-						taxiOverlay.UpdateItem(result.getDriver(),
-								(int) result.getGpsLocation().getLatitude(),
-								(int) result.getGpsLocation().getLongitude(),
-								result.getDriver(), "coool");
-					taxiOverlay.RefreshItems();
-					mapView.invalidate();
-				} else {
-					//AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-					// dialog.setTitle("Error");
-					// dialog.setMessage("recive null pointer from the server..");
-					// dialog.show();
-					System.out.println("no RPC answer from the server..");
-				}
-			}
-		}.execute();
-	}
     
     @Override
     protected boolean isRouteDisplayed() {

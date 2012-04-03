@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.cabit.R;
+import com.cabit.R.id;
+import com.cabit.R.layout;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
