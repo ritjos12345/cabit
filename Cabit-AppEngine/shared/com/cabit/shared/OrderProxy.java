@@ -12,12 +12,12 @@ public interface OrderProxy extends ValueProxy {
 
 	void setUser(String user);
 
-	AddressProxy getFrom();
+	GpsAddressProxy getFrom();
 
-	void setFrom(AddressProxy from);
+	void setFrom(GpsAddressProxy from);
 
-	AddressProxy getTo();
+	GpsAddressProxy getTo();
 
-	void setTo(AddressProxy to);
+	void setTo(GpsAddressProxy to);
 
 }

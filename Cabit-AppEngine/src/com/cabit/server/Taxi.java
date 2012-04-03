@@ -19,5 +19,9 @@ public class Taxi {
 	public void setGpsLocation(GpsLocation gpsLocation) {
 		this.gpsLocation = gpsLocation;
 	}
+	@Override
+	public String toString() {
+		return "Taxi [driver=" + driver + ", gpsLocation=" + gpsLocation + "]";
+	}
 	
 }

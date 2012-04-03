@@ -28,6 +28,12 @@ public class TaxiStatus {
 	public void setConnectionStatus(int connectionStatus) {
 		this.connectionStatus = connectionStatus;
 	}
+
+	@Override
+	public String toString() {
+		return "TaxiStatus [orders=" + orders + ", connectionStatus="
+				+ connectionStatus + "]";
+	}
 	
 	
 	

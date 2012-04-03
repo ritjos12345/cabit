@@ -2,7 +2,7 @@ package com.cabit.shared;
 
 import java.util.List;
 
-import com.cabit.server.Address;
+import com.cabit.server.GpsAddress;
 import com.cabit.server.GpsLocation;
 import com.cabit.server.Taxi;
 import com.cabit.server.TaxiStatus;
@@ -16,10 +16,10 @@ public interface CabitRequest extends RequestContext {
 	Request<TaxiStatusProxy> UpdateLocation(GpsLocationProxy loc);
 
 	Request<Boolean> UpdateOrder(int orderId,boolean except);
+	 
+	Request<Void> IAmNear(GpsLocationProxy loc);
 	
-	Request<Void> IAmNeer(GpsLocationProxy loc);
-	
-	Request<Integer> CreateOrder(AddressProxy from, AddressProxy to);
+	Request<Integer> CreateOrder(GpsAddressProxy from, GpsAddressProxy to);
 	
 	Request<Integer> GetOrderStatus(int orderId);
 	

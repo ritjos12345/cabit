@@ -43,7 +43,6 @@ public class DynamicOverlay<K> extends ItemizedOverlay<OverlayItem>{
 
 	public void RefreshItems() {
 		populate();
-		
 	}
 	
 	@Override
