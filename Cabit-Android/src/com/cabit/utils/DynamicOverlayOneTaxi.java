@@ -19,7 +19,7 @@ import android.util.Log;
 
 public class DynamicOverlayOneTaxi extends DynamicOverlay<String>{
 
-	private static final String TAG = "DynamicOverlayAllTaxi";
+	private static final String TAG = "DynamicOverlayOneTaxi";
 	protected MapView mapView;
 	protected Timer timer ;
 	protected String myTaxiName;
@@ -54,7 +54,7 @@ public class DynamicOverlayOneTaxi extends DynamicOverlay<String>{
 			protected TaxiProxy doInBackground(Void... params) {
 				MyRequestFactory requestFactory = Util.getRequestFactory( mContext, MyRequestFactory.class);
 				final CabitRequest request = requestFactory.cabitRequest();
-				Log.i(TAG, "Sending getTaxi request to server"); 
+				Log.i(TAG, "Sending request to server: GetTaxi"); 
 				request.GetTaxi(myTaxiName).fire(new Receiver<TaxiProxy>() {
 					@Override
 					public void onSuccess(TaxiProxy arg0) {
@@ -71,14 +71,17 @@ public class DynamicOverlayOneTaxi extends DynamicOverlay<String>{
 			@Override
 			protected void onPostExecute(TaxiProxy result) {
 				if (result != null) {
+						Log.i(TAG, "Answer from the server..");
+						Log.i(TAG, "update driver: "+ result.getDriver());
 						UpdateItem(result.getDriver(),
 								(int) result.getGpsLocation().getLatitude(),
 								(int) result.getGpsLocation().getLongitude(),
 								result.getDriver(), "coool");
+						
 					RefreshItems();
 					mapView.invalidate();
 				} else {
-					System.out.println("no RPC answer from the server..");
+					Log.i(TAG, "No answer from the server..");
 				}
 			}
 		}.execute();	
