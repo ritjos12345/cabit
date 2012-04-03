@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.cabit.client.MyRequestFactory;
-import com.cabit.shared.AddressProxy;
+import com.cabit.shared.GpsAddressProxy;
 import com.cabit.shared.CabitRequest;
 import com.cabit.shared.GpsLocationProxy;
 import com.cabit.shared.TaxiProxy;
@@ -133,7 +133,7 @@ public class orderCabMenu extends Activity{
 		                Log.i("orderCabMenu", 
 		                		myGpsLoc.getLatitude() + " " + myGpsLoc.getLongitude());
 		                // send the request
-		                request.IAmNeer(myGpsLoc).fire();
+		                request.IAmNear(myGpsLoc).fire();
 		                
 		                return null;
 					}
@@ -193,9 +193,9 @@ public class orderCabMenu extends Activity{
 	                Log.i("orderCabMenu", "Sending request details to server");
 	                
 	                // create the dests proxy vals
-	                AddressProxy mySrc = request.create(AddressProxy.class);
+	                GpsAddressProxy mySrc = request.create(GpsAddressProxy.class);
 	                mySrc.setTitle(srcTitle);
-	                AddressProxy myDst = request.create(AddressProxy.class);
+	                GpsAddressProxy myDst = request.create(GpsAddressProxy.class);
 	                myDst.setTitle(dests.get(index));
 	                
 	                // find the current pos details
@@ -340,3 +340,19 @@ public class orderCabMenu extends Activity{
 	
     
 }
+
+
+
+
+
+
+
+/* how to call TrackTaxi:
+ * 
+ 
+Intent intent = new Intent(FirstActivity.this, TrackTaxiActivity.class);
+Bundle b = new Bundle();
+b.putInt("taxi", TAXI_ID);
+intent.putExtras(b);
+
+*/

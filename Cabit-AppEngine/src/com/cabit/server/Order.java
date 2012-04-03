@@ -7,8 +7,8 @@ public class Order {
 
 	private int id;
 	private String user;
-	private Address from;
-	private Address to;
+	private GpsAddress from;
+	private GpsAddress to;
 	
 	public Order(){
 		
@@ -26,17 +26,23 @@ public class Order {
 	public void setUser(String user) {
 		this.user = user;
 	}
-	public Address getFrom() {
+	public GpsAddress getFrom() {
 		return from;
 	}
-	public void setFrom(Address from) {
+	public void setFrom(GpsAddress from) {
 		this.from = from;
 	}
-	public Address getTo() {
+	public GpsAddress getTo() {
 		return to;
 	}
-	public void setTo(Address to) {
+	public void setTo(GpsAddress to) {
 		this.to = to;
+	}
+
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", user=" + user + ", from=" + from
+				+ ", to=" + to + "]";
 	}
 	
 }

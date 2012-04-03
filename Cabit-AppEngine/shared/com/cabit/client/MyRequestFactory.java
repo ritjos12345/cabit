@@ -49,5 +49,4 @@ public interface MyRequestFactory extends RequestFactory {
 
 	CabitRequest cabitRequest();
 
-
 }
