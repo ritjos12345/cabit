@@ -68,10 +68,10 @@ public class DynamicOverlayAllTaxi extends DynamicOverlay<String>{
 
 			@Override
 			protected void onPostExecute(List<TaxiProxy> result) {
-				System.out.println("Answer from the server..");
 				if (result != null) {
+					Log.i(TAG, "Answer from the server..");
 					for (TaxiProxy taxiProxy : result) {
-						System.out.println("Update Taxi: " + taxiProxy.getDriver());
+						Log.i(TAG, "Update Taxi: " + taxiProxy.getDriver());
 						UpdateItem(taxiProxy.getDriver(),
 								(int) taxiProxy.getGpsLocation().getLatitude(),
 								(int) taxiProxy.getGpsLocation().getLongitude(),
@@ -81,8 +81,7 @@ public class DynamicOverlayAllTaxi extends DynamicOverlay<String>{
 					mapView.invalidate();
 					
 				} else {
-				
-					System.out.println("No answer from the server..");
+					Log.i(TAG, "No answer from the server..");
 				}
 			}
 		}.execute();	
