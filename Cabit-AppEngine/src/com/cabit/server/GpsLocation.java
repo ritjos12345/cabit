@@ -1,6 +1,7 @@
 package com.cabit.server;
 
 import java.awt.image.TileObserver;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -11,8 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.servlet.ServletContext;
 
+@SuppressWarnings("serial")
 @Entity
-public class GpsLocation {
+public class GpsLocation implements Serializable{
 	
 	private long latitude;
 	private long longitude;

@@ -55,11 +55,15 @@ public class ProgressThread extends Thread {
             Log.i("orderCabMenu", 
             		"asking about the current order status");
             // send the request
-        	request.GetOrderStatus(orderId).fire(new Receiver<Integer>() {	
+        	request.GetOrderStatus(orderId).fire(new Receiver<String>() {	
         		@Override
-				public void onSuccess(Integer arg0) {
+				public void onSuccess(String arg0) {
         			Log.i("orderCabMenu", "got request status "+arg0);
-        			statusSum += arg0;
+        			statusSum += 1;
+        			
+        			//TODO udi
+        			//statusSum += arg0;
+        			
         			// the third status answer
         		}
         		@Override

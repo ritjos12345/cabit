@@ -6,7 +6,7 @@ import com.google.web.bindery.requestfactory.shared.ValueProxy;
 @ProxyForName(value = "com.cabit.server.Order", locator = "com.cabit.server.OrderLocator")
 public interface OrderProxy extends ValueProxy {
 
-	int getId();
+	Integer getId();
 
 	String getUser();
 

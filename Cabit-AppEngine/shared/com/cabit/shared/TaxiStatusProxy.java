@@ -8,12 +8,13 @@ import com.google.web.bindery.requestfactory.shared.ValueProxy;
 @ProxyForName(value = "com.cabit.server.TaxiStatus", locator = "com.cabit.server.TaxiStatusLocator")
 public interface TaxiStatusProxy extends ValueProxy {
 
-	List<OrderProxy> getOrders();
+	List<OrderProxy> getOrders(); 
 
 	void setOrders(List<OrderProxy> orders);
 
-	int getConnectionStatus();
+	Integer getConnectionStatus();
 
-	void setConnectionStatus(int connectionStatus);
+	void setConnectionStatus(Integer connectionStatus);
 
 }
+ 
