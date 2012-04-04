@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+
+// talking with server thread
 public class ProgressThread extends Thread {
     Handler mHandler;
     final static int STATE_DONE = 0;
