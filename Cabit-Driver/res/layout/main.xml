@@ -8,5 +8,5 @@
 				android:layout_width="fill_parent"
                 android:layout_height="wrap_content" 
 				android:clickable="true"
-                android:apiKey="0hobjRVgJGROYTVq0ddtUYVYS7xVyGl0otzBB6Q" />
+                android:apiKey="0hobjRVgJGRPnaMC5aumkjrdn5Ep0sl1Cjk8tYg" />
 </LinearLayout>

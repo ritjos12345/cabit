@@ -2,4 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="@string/accounts"
           android:icon="@drawable/ic_mailboxes_accounts" />
+    
+    <item android:id="@+id/alert_dialog"
+          android:icon="@drawable/taxi" />
 </menu>
