@@ -33,12 +33,12 @@ public class CabitService {
 	
 	// User RPC functions
 	@ServiceMethod
-	public void IAmNeer(GpsLocation loc){
+	public void IAmNear(GpsLocation loc){
 		// TODO Auto-generated method stub
 	}
 	
 	@ServiceMethod
-	public int CreateOrder(Address from, Address to){  // return the order id
+	public int CreateOrder(GpsAddress from, GpsAddress to){  // return the order id
 		// TODO Auto-generated method stub
 		return 1;
 	}
