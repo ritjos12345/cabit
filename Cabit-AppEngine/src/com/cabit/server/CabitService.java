@@ -9,12 +9,19 @@ import com.cabit.annotation.ServiceMethod;
 public class CabitService {
 
 	// Taxi RPC functions
-	private int i ;
-	private int i2 ;
+	private int i, b=0 ;
 	@ServiceMethod
 	public TaxiStatus UpdateLocation(GpsLocation loc){
 		// TODO Auto-generated method stub
-		return null;
+		if(b==2)
+		{
+			return new TaxiStatus();
+		}
+		else
+		{
+			b++;
+			return null;
+		}
 	}
 	
 	@ServiceMethod
@@ -26,12 +33,12 @@ public class CabitService {
 	
 	// User RPC functions
 	@ServiceMethod
-	public void IAmNear(GpsLocation loc){
+	public void IAmNeer(GpsLocation loc){
 		// TODO Auto-generated method stub
 	}
 	
 	@ServiceMethod
-	public int CreateOrder(GpsAddress from, GpsAddress to){  // return the order id
+	public int CreateOrder(Address from, Address to){  // return the order id
 		// TODO Auto-generated method stub
 		return 1;
 	}
@@ -44,32 +51,17 @@ public class CabitService {
 	
 	@ServiceMethod
 	public Taxi GetTaxi(String driver){
-		i2=(i2+1) % 40;
-		
-		GpsLocation g = new GpsLocation();
-		g.setLatitude((int) (  i2*1e6)); // 33.5
-		g.setLongitude((int) (34.5*1e6));
-		
-		g.setLatitude((int) ( 33.5*1e6)); // 33.5
-		g.setLongitude((int) (34.5*1e6));//34.5*1e6));
-		
-		Taxi t= new Taxi();
-		t.setDriver("udi");
-		t.setGpsLocation(g);
-		
-		return t;
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	@ServiceMethod
 	public List<Taxi> GetAllTaxi(){
-		i=(i+1) % 40;
+		i=i+1 % 40;
 		LinkedList<Taxi> l  = new LinkedList<Taxi>();
 		GpsLocation g = new GpsLocation();
 		g.setLatitude((int) (  i*1e6)); // 33.5
-		g.setLongitude((int) (i*1e6));//34.5*1e6));
-		
-		
-		
+		g.setLongitude((int) (34.5*1e6));
 		Taxi t= new Taxi();
 		t.setDriver("udi2");
 		t.setGpsLocation(g);
