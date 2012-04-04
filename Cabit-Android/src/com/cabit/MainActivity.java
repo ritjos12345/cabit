@@ -69,10 +69,10 @@ public class MainActivity extends MapActivity {
 				// orderMenu.class);
 				
 				// TODO udi fix this
-	//			Intent intent = new Intent(mContext, orderCabMenu.class);
-//				startActivityForResult(intent, 1);
+				Intent intent = new Intent(mContext, orderCabMenu.class);
+				startActivityForResult(intent, 1);
 				
-				Intent intent = new Intent(mContext,
+	/*			Intent intent = new Intent(mContext,
 				TrackTaxiActivity.class);
 				
 				Bundle b = new Bundle();
@@ -80,7 +80,7 @@ public class MainActivity extends MapActivity {
 				intent.putExtras(b);
 
 				startActivityForResult(intent, 1);
-						
+*/						
 			}
 		});
 
