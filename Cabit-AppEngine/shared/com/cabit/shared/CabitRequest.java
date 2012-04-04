@@ -17,7 +17,7 @@ public interface CabitRequest extends RequestContext {
 
 	Request<Boolean> UpdateOrder(int orderId,boolean except);
 	 
-	Request<Void> IAmNear(GpsLocationProxy loc);
+	Request<Void> IAmNear(GpsLocationProxy loc); 
 	
 	Request<Integer> CreateOrder(GpsAddressProxy from, GpsAddressProxy to);
 	
