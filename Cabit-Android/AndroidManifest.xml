@@ -74,7 +74,7 @@
                 <category android:name="com.cabit" />
             </intent-filter>
         </receiver>
-        <activity android:name=".orderMenu"></activity>
-        <activity android:name=".orderCabMenu"></activity>
+        
+        <activity android:name=".OrderCabMenu"></activity>
     </application>
 </manifest>

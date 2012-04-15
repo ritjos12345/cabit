@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.cabit.client.MyRequestFactory;
 import com.cabit.client.MyRequestFactory.RegistrationInfoRequest;
+import com.cabit.driver.utils.Util;
 import com.cabit.shared.RegistrationInfoProxy;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.Request;

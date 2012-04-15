@@ -19,6 +19,12 @@ public class Order implements Serializable{
 	
 	
 	
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", user=" + user + ", from=" + from
+				+ ", to=" + to + "]";
+	}
+
 	public Order(){
 		this.potentialDrivers = new LinkedList<Taxi>();
 		this.driversBlackList = new LinkedList<Taxi>();
@@ -66,8 +72,12 @@ public class Order implements Serializable{
 	
 	//add drivers to the list of optional drivers
 	public void addDrivers(List<Taxi> newDrivers){
-		this.potentialDrivers.removeAll(newDrivers);		//behavior ???
+		//this.potentialDrivers.removeAll(newDrivers);
 		this.potentialDrivers.addAll(newDrivers);
+	}
+	
+	public void removeDriver(Taxi driver){
+		this.potentialDrivers.remove(driver);
 	}
 	
 	//remove the list of  potential drivers after updating them, skip a given taxi
@@ -80,5 +90,10 @@ public class Order implements Serializable{
 				}
 			}
 		}
+	}
+	
+	//return the number of currently potential drivers
+	public int numOfPotentionDrivers(){
+		return this.potentialDrivers.size();
 	}
 }

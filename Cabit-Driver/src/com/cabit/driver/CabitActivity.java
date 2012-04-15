@@ -20,6 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.R.bool;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -53,6 +54,7 @@ import com.cabit.shared.CabitRequest;
 import com.cabit.shared.TaxiProxy;
 import com.cabit.shared.TaxiStatusProxy;
 import com.cabit.driver.ProgressThread;
+import com.cabit.driver.utils.Util;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
@@ -68,7 +70,7 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
  * Main activity 
  * a menu item to invoke the accounts activity.
  */
-public class CabitActivity extends MapActivity  {
+public class CabitActivity extends Activity  {
     /**
      * Tag for logging.
      */
@@ -78,22 +80,6 @@ public class CabitActivity extends MapActivity  {
      * The current context.
      */
     private Context mContext = this;
-    
-    private MapView mapView = null;
-    
-    private MyLocationOverlay myLocationOverlay;
-    
-    private int mHour;
-    private int mMinute;
-	final int ALERT_DIALOG_ID = 0;
-	final int PROGRESS_HORIZONTAL_DIALOG_ID = 1;
-	final int PROGRESS_SPINNER_DIALOG_ID = 2;
-	final int TIME_PICK_DIALOG_ID = 3;
-	final int DATE_PICK_DIALOG_ID = 4;
-	ProgressDialog progressDialog;
-	ProgressThread progressThread;
-	Timer timer;
-	Boolean wantTimer=true;
     
     
     /**
@@ -138,22 +124,10 @@ public class CabitActivity extends MapActivity  {
     	Log.i(TAG, "onCreate");
         registerReceiver(mUpdateUIReceiver, new IntentFilter(Util.UPDATE_UI_INTENT));
         
-        timer = new Timer();
-	     
-	    int FPS = 12;
-	    timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				if(wantTimer==true)
-				{
-					Log.i(TAG, "updateTaxy");
-					UpdateTaxi();
-				}
-				
-			}
-		},0,1000*FPS);  
-        
-    }
+
+		setContentView(R.layout.cabitactivity);
+	}
+
     
     @Override
     public void onResume() {
@@ -165,18 +139,9 @@ public class CabitActivity extends MapActivity  {
         if (Util.DISCONNECTED.equals(connectionStatus)) {
             startActivity(new Intent(this, AccountsActivity.class));
         }
-         
-        setScreenContent(R.layout.main); 
-        
-    }
 
-    
-    @Override
-    protected void onPause() {
-            super.onPause();
-            // when our activity pauses, we want to remove listening for location updates
-            myLocationOverlay.disableMyLocation();
-    }
+		setScreenContent(R.layout.cabitactivity);
+	}
     
 
 	/**
@@ -200,203 +165,36 @@ public class CabitActivity extends MapActivity  {
 
     // Manage UI Screens
 
-    private void setMainContent() {
-    	
-	    	mapView = (MapView) findViewById(R.id.mapview);
-		    mapView.setBuiltInZoomControls(true);
-		    
-		    mapView.setClickable(true);
-	        mapView.setEnabled(true);
-	        mapView.setSatellite(true);
-	        
-			 // create an overlay that shows our current location
-	        
-	        
-	        myLocationOverlay = new FixedMyLocationOverlay(this, mapView);
-	        
-	        
-	        // add this overlay to the MapView and refresh it
-	        mapView.getOverlays().add(myLocationOverlay);
-	        mapView.postInvalidate();
-	        mapView.setOnKeyListener(new OnKeyListener() {
-				
-				@Override
-				public boolean onKey(View v, int keyCode, KeyEvent event) {
-					new AlertDialog.Builder(mContext)
-                    .setTitle("New client request")
-                    .setMessage("www.udi@gmail.com is waiting for you. \n Target: Herzel, SK S0A, Canada")
-                    .show();
-					return true;
-				}
-			});
-	        // call convenience method that zooms map on our location
-	        
-    	
-    	myLocationOverlay.enableCompass();
-    	myLocationOverlay.enableMyLocation();
-    	myLocationOverlay.runOnFirstFix(new Runnable() {
-			
-			@Override
-			public void run() {
-				GeoPoint myLocationGeoPoint = myLocationOverlay.getMyLocation();
-	            if(myLocationGeoPoint != null) {
-	                    mapView.getController().animateTo(myLocationGeoPoint);
-	                    mapView.getController().setZoom(10);
-	            }
-	            /*else {
-	                    Toast.makeText(this, "Cannot determine location", Toast.LENGTH_SHORT).show();
-	            }*/
-				
-			}
-		});
-    	
-    	/*Timer timer = new Timer();
-	     
-	    int FPS = 12;
-	    timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				UpdateTaxi();
-				
-			}
-		},0,1000*FPS);  */
-    	
-    	
-    	
-    }
-    
-    
-private void UpdateTaxi() {
-	wantTimer=false;
-	System.out.println("StartUpdate!!!!!!!!!!!!!!!!!!!!!!!!!!");
-	new AsyncTask<Void, Void, TaxiStatusProxy>(){
-		private TaxiStatusProxy result;
-		@Override
-		protected TaxiStatusProxy doInBackground(Void... params) {
-			// TODO Auto-generated method stub
-			MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
-            final CabitRequest request = requestFactory.cabitRequest();
-            System.out.println("before requestttttttttttttttt");
-            request.UpdateLocation(null).fire(new Receiver<TaxiStatusProxy>() {
+	private void setContent() {
+		/*try {
+			Thread.sleep(8000);
+		} catch (InterruptedException e) {
+		}*/
+		
+		//Intent intent = new Intent(mContext, MainActivity.class);
+		//startActivity(intent);
+		
+		Timer timer = new Timer();
 
-				@Override
-				public void onSuccess(TaxiStatusProxy arg0) {
-					// TODO Auto-generated method stub
-					result = arg0;
-					System.out.println("sucsessssssssssssss");
-				}
-			});
-			return result;
-		}
-		
-		@Override
-        protected void onPostExecute(TaxiStatusProxy result) {
-			clientWantsYou().show();
-		}
-		
-	}.execute();
-	
-        
+		int FPS = 3;
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Intent intent = new Intent(mContext, MainActivity.class);
+				startActivity(intent);
+			}
+		},  1000 * FPS);
 		
 	}
-
-private void msgDisplay(String msg)
-{
-    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-}
-
-    /**
-     * This method zooms to the user's location with a zoom level of 10.
-     * @return 
-     */
-    private AlertDialog clientWantsYou() {
-    	
-    	
-
-	    	    // Define the Handler that receives messages from the thread and update the progress
-	    	    final Handler handler = new Handler() {
-	    	        public void handleMessage(Message msg) {
-	    	            int total = msg.getData().getInt("total");
-	    	            progressDialog.setProgress(total);
-	    	            if (total >= 100){
-	    	                //dismissDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
-	    	            	progressDialog.dismiss();
-	    	                progressThread.setState(ProgressThread.STATE_DONE);
-	    	                msgDisplay("Progress Dialog is Done");
-	    	            }
-	    	        }
-	    	    };
-
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("A client have choose you!"+'\n'+"Would you like to pick him?");
-        builder.setTitle("New Cab Order!");
-        builder.setIcon(R.drawable.taxi);
-        builder.setCancelable(false);
-        progressDialog= new ProgressDialog(this);
-    	progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-    	progressDialog.setMessage("Updating the client...");
-    	progressDialog.setCancelable(false);
-    	progressDialog.setIndeterminate(false);
-    	progressDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "cancel",new DialogInterface.OnClickListener() {
-	           public void onClick(DialogInterface dialog, int id) {
-	        	   msgDisplay("Action is cancelled");
-	        }
-	       });
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-        	
-               public void onClick(DialogInterface dialog, int id) {
-               	   progressDialog.show();
-            	   //showDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
-               	
-                   progressThread = new ProgressThread(handler);
-                    progressThread.start();
-                   //msgDisplay("Client was update.");
-               }
-           });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-               public void onClick(DialogInterface dialog, int id) {
-               	ProgressDialog.show(CabitActivity.this, "","Canceling the client...", false,true,new DialogInterface.OnCancelListener(){
-                       public void onCancel(DialogInterface dialog){
-                           msgDisplay("Action is cancelled");
-                          }
-                      });
-                   msgDisplay("Client was canceled.");
-               }
-           });
-        AlertDialog alert = builder.create();
-        return(alert);
-        
-        
-    }
-    
-
-    
+	
 	/**
-     * Sets the screen content based on the screen id.
-     */
-    private void setScreenContent(int screenId) {
-    	setContentView(R.layout.main);        
-        switch (screenId) {
-            case R.layout.main:
-                setMainContent();
-                break;
-        }
-    }
-
-	@Override
-	protected boolean isRouteDisplayed() {
-		// TODO Auto-generated method stub
-		return false;
+	 * Sets the screen content based on the screen id.
+	 */
+	private void setScreenContent(int screenId) {
+		switch (screenId) {
+		case R.layout.cabitactivity:
+			setContent();
+			break;
+		}
 	}
-
-	
 }

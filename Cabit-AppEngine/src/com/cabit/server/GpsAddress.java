@@ -1,10 +1,12 @@
 package com.cabit.server;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 
 @SuppressWarnings("serial")
 @Entity
-public class GpsAddress {
+public class GpsAddress implements Serializable{
 	String title;
 	GpsLocation location;
 	

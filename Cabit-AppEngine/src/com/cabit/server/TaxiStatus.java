@@ -8,6 +8,12 @@ import javax.persistence.Entity;
 @Entity
 public class TaxiStatus {
 	
+	@Override
+	public String toString() {
+		return "TaxiStatus [orders=" + orders + ", connectionStatus="
+				+ connectionStatus + "]";
+	}
+
 	private List<Order> orders;
 	private Integer connectionStatus;	
 	/* 

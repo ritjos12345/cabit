@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -32,7 +34,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
@@ -249,15 +253,53 @@ public class Util {
         return Util.class.getPackage().getName();
     }
     
+    /*public static List<String> GetAddressFromName(Context context ,String locationName,int maxAddress){
+    	
+		
+	    
+    }
+    */
+    
     public static Location GetMyLocation(Context context){
     	// initalize the gps systems we would use afterwards
-    	
-    	LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-        Criteria crit = new Criteria();
-        crit.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = lm.getBestProvider(crit, true);
-        
-    	return lm.getLastKnownLocation(provider);
-    	
+    	try{
+	    	LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+	        Criteria crit = new Criteria();
+	        crit.setAccuracy(Criteria.ACCURACY_FINE);
+	        String provider = lm.getBestProvider(crit, true);
+	        return lm.getLastKnownLocation(provider);
+    	}
+        catch(Exception e){
+            return null;
+        }
     }
+    
+    public static String GetAddressFromLocation(Context context,Location loc){
+    	// initalize the gps systems we would use afterwards
+    	
+    	String address = "";
+        Geocoder geoCoder = null;
+        geoCoder = new Geocoder(context);
+        
+    	try {
+        	Log.i("Util","/////"+loc.getAltitude()+","+loc.getLatitude());
+        	List<Address> addresses = geoCoder.getFromLocation( loc.getAltitude(),loc.getLatitude(),1);
+			if (addresses.size()>0) {
+			    for (int index = 0; 
+			    		index < addresses.get(0).getMaxAddressLineIndex();
+			    		index++){
+			    	address += addresses.get(0).getAddressLine(index) + " ";
+			    }
+			}
+			else{
+				  Log.e("Util", "couldn't find the adress");
+			}
+        }
+        catch (Exception e) { 
+        	Log.e("Util", "bad gps location");
+        }
+        
+        return address;
+    }
+    
 }

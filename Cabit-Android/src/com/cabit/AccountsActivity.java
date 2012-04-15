@@ -1,3 +1,5 @@
+// DO NOT CHANGE ME !!
+
 /*
  * Copyright 2010 Google Inc.
  * 
@@ -58,7 +60,7 @@ import com.google.android.c2dm.C2DMessaging;
 
 /**
  * Account selections activity - handles device registration and unregistration.
- */
+ */ 
 public class AccountsActivity extends Activity {
 
     /**
