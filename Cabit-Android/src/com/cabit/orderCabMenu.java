@@ -41,7 +41,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class orderCabMenu extends Activity{
+public class OrderCabMenu extends Activity{
 	
 	private static final String TAG = "orderCabMenu";
 	private Context mContext = this;
@@ -53,8 +53,6 @@ public class orderCabMenu extends Activity{
 	ProgressThread progressThread;
 	List<Address> destAdresses;
 	final int PROGRESS_HORIZONTAL_DIALOG_ID = 1;
-	
-	
 	int orderId;
 	 
     /** Called when the activity is first created. */
@@ -68,8 +66,6 @@ public class orderCabMenu extends Activity{
         editTextSearch = (EditText) findViewById(R.id.edit_text_search);
         dests = new ArrayList<String>();
         
-        
-        
         buttonCommit.setOnClickListener(new View.OnClickListener() {	
         	public void onClick(View v) {
 	
@@ -77,7 +73,7 @@ public class orderCabMenu extends Activity{
                 
 				// if no search val was added
 				if (true==editTextSearch.getText().toString().equals("")){
-					Toast.makeText(orderCabMenu.this,"Enter a dest to search!",Toast.LENGTH_LONG).show();
+					Toast.makeText(OrderCabMenu.this,"Enter a dest to search!",Toast.LENGTH_LONG).show();
 					return;
 				}
 				
@@ -132,6 +128,7 @@ public class orderCabMenu extends Activity{
 		                	// in case that couldn't retrieve the gps location, set fake pos
 		                	myGpsLoc.setLatitude((int) (33.5*1e6));
 			                myGpsLoc.setLongitude((int) (34.5*1e6));
+			                Log.e("orderCabMenu", "couldn't retrieve the gps location");
 		                }
 		                
 		                Log.i("orderCabMenu", 
@@ -183,7 +180,7 @@ public class orderCabMenu extends Activity{
 		}
 		else{
 			
-	        Toast.makeText(orderCabMenu.this,"searching for a cab to "+dests.get(index),
+	        Toast.makeText(OrderCabMenu.this,"searching for a cab to "+dests.get(index),
 	        		Toast.LENGTH_LONG).show();
 			
 			// updating the server about the cab to search
@@ -192,44 +189,30 @@ public class orderCabMenu extends Activity{
 	            
 				@Override
 				protected Integer doInBackground(Void... params) {
-				    MyRequestFactory requestFactory = Util.getRequestFactory(getBaseContext(), MyRequestFactory.class);
+					
+					MyRequestFactory requestFactory = Util.getRequestFactory(getBaseContext(), MyRequestFactory.class);
 	                final CabitRequest request = requestFactory.cabitRequest();
-	                Log.i("orderCabMenu", "Sending request details to server");
 	                
-	                // create the dests proxy vals
-	                GpsAddressProxy mySrc = request.create(GpsAddressProxy.class);
-	                mySrc.setTitle(srcTitle);
+	                // create src address
+                    GpsAddressProxy mySrc = request.create(GpsAddressProxy.class);
+                    Location loc = Util.GetMyLocation(mContext);
+                    mySrc.setTitle(Util.GetAddressFromLocation(mContext, loc) );
+                    GpsLocationProxy mySrcLoc = request.create(GpsLocationProxy.class);
+                    mySrcLoc.setLatitude((long) loc.getLatitude());
+                    mySrcLoc.setLongitude((long) loc.getLongitude());
+                    mySrc.setLocation(mySrcLoc);
+                    
+	                 
+                    
+	                // create dst address
 	                GpsAddressProxy myDst = request.create(GpsAddressProxy.class);
 	                myDst.setTitle(dests.get(index));
+	                GpsLocationProxy myDstLoc = request.create(GpsLocationProxy.class);
+	                myDstLoc.setLatitude((long) destAdresses.get(index).getLatitude());
+	                myDstLoc.setLongitude((long) destAdresses.get(index).getLongitude());
+                    mySrc.setLocation(myDstLoc);
 	                
-	                // find the current pos details
-	                Location loc = Util.GetMyLocation(mContext);
-	                
-                    String address = "";
-                    Geocoder geoCoder = null;
-                    geoCoder = new Geocoder(getBaseContext());
-                    // geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
-                    
-                    try {
-                    	Log.i("orderCabMenu","/////"+loc.getAltitude()+","+loc.getLatitude());
-                    	List<Address> addresses = geoCoder.getFromLocation(
-                        loc.getAltitude(),loc.getLatitude(),1);
-                      if (addresses.size()>0) {
-                        for (int index = 0; 
-                        		index < addresses.get(0).getMaxAddressLineIndex();
-                        		index++)
-                          address += addresses.get(0).getAddressLine(index) + " ";
-                      }
-                      else{
-                    	  Log.e("orderCabMenu", "couldn't find the adress");
-                      }
-                    }
-                    catch (Exception e) { 
-                    	Log.e("orderCabMenu", "bad gps location");
-                    }   
-	                
-                    mySrc.setTitle(address);
-	                
+                    Log.i("orderCabMenu", "Sending request details to server: CreateOrder");
 	                Log.i("orderCabMenu", "Src "+mySrc.getTitle()+" dest "+myDst.getTitle());
 	                
 	                // fire the order
@@ -241,9 +224,6 @@ public class orderCabMenu extends Activity{
 						
 						@Override
 	                    public void onFailure(ServerFailure error) {
-							Log.e("orderCabMenu",error.getClass().getName()+", "
-									+error.getExceptionType()+", "+error.getMessage()
-									+", "+error.getStackTraceString());
 	                		result = null;
 	                    }
 					});
@@ -259,10 +239,10 @@ public class orderCabMenu extends Activity{
 		            	progressThread.setState(1);
 		            	progressThread.setOrderId(orderId);
 		            	progressDialog.setMessage("searching for a fitting cab");
-		            	Toast.makeText(orderCabMenu.this,"order id is "+result+" searching for a cab",
+		            	Toast.makeText(OrderCabMenu.this,"order id is "+result+" searching for a cab",
 	        	        		Toast.LENGTH_LONG).show();
 	            	}else{
-	            		Toast.makeText(orderCabMenu.this,"recive null pointer from the server..",
+	            		Toast.makeText(OrderCabMenu.this,"recive null pointer from the server..",
 	        	        		Toast.LENGTH_LONG).show();
 	            	}
 	            }
@@ -283,7 +263,7 @@ public class orderCabMenu extends Activity{
 	    	progressDialog.setIndeterminate(false);
 	    	progressDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "cancel",new DialogInterface.OnClickListener() {
 		           public void onClick(DialogInterface dialog, int id) {
-		        	   Toast.makeText(orderCabMenu.this,"Action is cancelled",Toast.LENGTH_LONG).show();
+		        	   Toast.makeText(OrderCabMenu.this,"Action is cancelled",Toast.LENGTH_LONG).show();
 		        	   // means to kill the progress thread
 		        	   progressThread.setState(0);
 		        }
@@ -327,15 +307,27 @@ public class orderCabMenu extends Activity{
            
             // if finished talking with the server 
             if (total >= 100){
+            	// get the driver ID
+            	String TAXI_ID = progressThread.getDriverId();
+            	
             //if (total >= 1000){
                 //dismissDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
                 progressDialog.dismiss();
                 progressThread.setState(ProgressThread.STATE_DONE);
-                Toast.makeText(orderCabMenu.this,"Fitting cab was found!",Toast.LENGTH_LONG).show();
+                Toast.makeText(OrderCabMenu.this,"Fitting cab was found!",Toast.LENGTH_LONG).show();
                 
+/*
                 // here we return to the map
-                //Intent intent = new Intent(OrderACabActivity.this, orderMenu.class);
-				//startActivityForResult(intent,1 );
+                Intent intent = new Intent(orderCabMenu.this, TrackTaxiActivity.class);
+                Bundle b = new Bundle();
+                b.putString("taxi", TAXI_ID);
+                intent.putExtras(b);
+
+                startActivityForResult(intent, 1);
+                
+                
+                // finish() ?
+*/
             }
         }
     };

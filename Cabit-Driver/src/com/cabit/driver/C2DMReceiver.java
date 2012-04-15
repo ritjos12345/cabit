@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.cabit.driver.utils.Util;
 import com.google.android.c2dm.C2DMBaseReceiver;
 
 /**

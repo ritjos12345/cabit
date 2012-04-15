@@ -1,3 +1,5 @@
+// DO NOT CHANGE ME !!
+
 /*
  * Copyright 2011 Google Inc.
  * 

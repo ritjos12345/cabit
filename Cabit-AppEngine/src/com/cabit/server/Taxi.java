@@ -12,6 +12,11 @@ public class Taxi implements Serializable{
 	private String driver;
 	private GpsLocation gpsLocation;
 	private TaxiStatus status;
+	
+	
+	public Taxi(){
+		status = new TaxiStatus();
+	}
 
 	
 	//add another order to the taxi's current status
@@ -48,5 +53,13 @@ public class Taxi implements Serializable{
 	public void updateFreqRate(Integer freq){
 		this.status.setConnectionStatus(freq);
 	}
+
+
+	@Override
+	public String toString() {
+		return "Taxi [driver=" + driver + ", gpsLocation=" + gpsLocation
+				+ ", status=" + status + "]";
+	}
+	
 	
 }

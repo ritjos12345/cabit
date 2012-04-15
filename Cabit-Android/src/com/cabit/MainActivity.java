@@ -43,10 +43,18 @@ public class MainActivity extends MapActivity {
 	protected DynamicOverlayAllTaxi taxiOverlay ;
 	protected DynamicOverlayMyLocation myLocationOverlay;
 	protected Button buttonOrderEntry;
+
+	public void onPause(){
+		super.onPause();
+		taxiOverlay.Stop();
+		myLocationOverlay.stop();
+		
+	}
 	
 	public void onCreate(Bundle savedInstanceState) 
     {
 		super.onCreate(savedInstanceState);
+		
         setContentView(R.layout.main);
 
 		mapView = (MapView) findViewById(R.id.mapview);
@@ -55,7 +63,7 @@ public class MainActivity extends MapActivity {
 		
 		taxiOverlay = new DynamicOverlayAllTaxi(this.getResources().getDrawable(R.drawable.taxi), mapView);
 		mapView.getOverlays().add(taxiOverlay);
-		taxiOverlay.Start(20);
+		taxiOverlay.Start(15);
 
 		myLocationOverlay =new DynamicOverlayMyLocation(this.getResources().getDrawable(R.drawable.dot), mapView, false);
 		mapView.getOverlays().add(myLocationOverlay);
@@ -69,7 +77,9 @@ public class MainActivity extends MapActivity {
 				// orderMenu.class);
 				
 				// TODO udi fix this
-				Intent intent = new Intent(mContext, orderCabMenu.class);
+
+				finish();
+				Intent intent = new Intent(mContext, OrderCabMenu.class);
 				startActivityForResult(intent, 1);
 				
 	/*			Intent intent = new Intent(mContext,
@@ -95,7 +105,7 @@ public class MainActivity extends MapActivity {
 		return false;
 	}
 	
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+/*	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1) {
 			if (resultCode == RESULT_OK) {
 
@@ -109,10 +119,10 @@ public class MainActivity extends MapActivity {
 				final int myLatitude = 33;
 				final int myLongitude = 33;
 				// TODO fix this
-				/*
+				
 				 * if(loc != null){ myLatitude = (int) (loc.getLatitude()*1e6);
 				 * myLongitude= (int) (loc.getLongitude()*1e6); }
-				 */
+				 
 				new AlertDialog.Builder(this)
 						.setMessage(
 								"Do you want to order a cab to \n" + address
@@ -139,7 +149,7 @@ public class MainActivity extends MapActivity {
 												Log.i(TAG,
 														"Sending request to server");
 
-												/*
+												
 												 * LocationProxy from =
 												 * request.create
 												 * (LocationProxy.class);
@@ -177,7 +187,7 @@ public class MainActivity extends MapActivity {
 												 * ()); result = null; }
 												 * 
 												 * });
-												 */
+												 
 												return result;
 											}
 
@@ -219,9 +229,11 @@ public class MainActivity extends MapActivity {
 								}).show();
 
 			}
+			
+			
 		}
 	}
-
+*/
 
 
 }

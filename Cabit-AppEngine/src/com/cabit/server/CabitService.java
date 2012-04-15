@@ -9,18 +9,14 @@ import com.cabit.annotation.ServiceMethod;
 
 public class CabitService {
 	
-	// instance of the Data Store
-	final private DataStore db = new DataStore();
+	private static DataStore db = DataStore.GetInstance();
 
-	
 	//// Taxi RPC functions ////
-	
 	
 	// update Taxi's location, return list of (pending) orders
 	@ServiceMethod
 	public TaxiStatus UpdateLocation(GpsLocation loc){
-		
-		return db.updateTaxiGpsLocation(loc);
+		return db.updateTaxiGpsLocation(loc, Utils.getUserEmail());
 	}
 	
 	//return true if order accepted (= true) and order is available
@@ -28,11 +24,11 @@ public class CabitService {
 	public boolean UpdateOrder(int orderId,boolean accepted){
 		//if driver accepted to take an order
 		if (accepted){
-			return db.takeOrder(orderId);
+			return db.takeOrder(orderId, Utils.getUserEmail());
 		}
 		else{
-			db.rejectOrder(orderId);
-			return true;
+			db.rejectOrder(orderId, Utils.getUserEmail());
+			return false;
 		}
 	}
 	
@@ -41,13 +37,11 @@ public class CabitService {
 	//// User RPC functions ////
 	
 	
+
 	//update nearby drivers update-frequency
 	@ServiceMethod
 	public void IAmNear(GpsLocation loc){
-		
-		///////////////////////////////////////
-		System.out.println("IAmNeer");
-		///////////////////////////////////////
+		System.out.println("IAmNear");
 		
 		List<Taxi> cabs = db.allCabs();
 		
@@ -61,16 +55,15 @@ public class CabitService {
 	
 	@ServiceMethod
 	public int CreateOrder(GpsAddress from, GpsAddress to){  // return the order id
-		
-		///////////////////////////////////////
 		System.out.println("CreateOrder");
-		///////////////////////////////////////
-		
+		System.out.println("1");
 		//create the order object
-		Order ord = db.createOrder(from, to);
-		
+		Order ord = db.createOrder(from, to, Utils.getUserEmail());
+		System.out.println("2");
 		//inform potential cabs of the order
 		db.newPotentialDrivers(ord);
+		System.out.println("3");
+		System.out.println("new order number : "+ord.getId());
 		
 		return ord.getId().intValue();
 	}
@@ -98,12 +91,11 @@ public class CabitService {
 			return CJ.get(new Integer(orderId));
 		}
 	}
-	
-	@ServiceMethod
+	//@ServiceMethod
 	public Taxi GetTaxi(String driver){		//GetTaxi?!?! F*** them
 		
 		///////////////////////////////////////
-		System.out.println("GetTaxi");
+		//System.out.println("GetTaxi");
 		///////////////////////////////////////
 		
 		return db.findTaxi(driver);
@@ -111,27 +103,14 @@ public class CabitService {
 	
 	
 	////// naive !!!
-	@ServiceMethod
+	//@ServiceMethod
 	public List<Taxi> GetAllTaxi(){
 		///////////////////////////////////////
-		System.out.println("getAllTaxi");
+		//System.out.println("getAllTaxi");
 		///////////////////////////////////////
+		
 		return db.allCabs();
 	}
-	
-	
-	
-	
-	
-	
-	/*
-	 ////////////////////////////////////////// t e s t //////////////////////////////
-	@ServiceMethod
-	public void testRequest(){
-		System.out.println("testRequest operates at the server");
-		db.testData();
-	}*/
-	
 	
 	
 }

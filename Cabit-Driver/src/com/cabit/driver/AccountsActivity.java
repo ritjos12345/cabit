@@ -50,11 +50,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cabit.driver.R;
+import com.cabit.driver.utils.Util;
 import com.google.android.c2dm.C2DMessaging;
 
 /**
  * Account selections activity - handles device registration and unregistration.
- */
+ */ 
 public class AccountsActivity extends Activity {
 
     /**
@@ -87,24 +88,16 @@ public class AccountsActivity extends Activity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	System.out.println("b0");
         super.onCreate(savedInstanceState);
 
-        System.out.println("b1");
         SharedPreferences prefs = Util.getSharedPreferences(mContext);
-        System.out.println("b2");
         String deviceRegistrationID = prefs.getString(Util.DEVICE_REGISTRATION_ID, null);
-        System.out.println("b3");
         if (deviceRegistrationID == null) {
             // Show the 'connect' screen if we are not connected
-        	System.out.println("b4");
             setScreenContent(R.layout.connect);
-            System.out.println("b5");
         } else {
             // Show the 'disconnect' screen if we are connected
-        	System.out.println("b6");
             setScreenContent(R.layout.disconnect);
-            System.out.println("b7");
         }
     }
 
@@ -114,21 +107,13 @@ public class AccountsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("a1");
         if (mPendingAuth) {
-        	System.out.println("a2");
             mPendingAuth = false;
-            System.out.println("a3");
             String regId = C2DMessaging.getRegistrationId(mContext);
-            System.out.println("a4");
             if (regId != null && !"".equals(regId)) {
-            	System.out.println("a5");
                 DeviceRegistrar.registerOrUnregister(mContext, regId, true);
-                System.out.println("a6");
             } else {
-            	System.out.println("a7");
                 C2DMessaging.register(mContext, Setup.SENDER_ID);
-                System.out.println("a8");
             }
         }
     }

@@ -24,6 +24,7 @@ public class ProgressThread extends Thread {
     int orderId;
     int statusSum;
     Context myContext;
+    String driverId;
 
     ProgressThread(Handler h, Context context) {
         mHandler = h;
@@ -31,6 +32,7 @@ public class ProgressThread extends Thread {
         // initialize the order num
         orderId = -1;
         statusSum = 0;
+        driverId = "";
     }
 
     public void run() {
@@ -40,7 +42,7 @@ public class ProgressThread extends Thread {
         	try {
                 Thread.sleep(2500);
             } catch (InterruptedException e) {
-                Log.e("ERROR", "Thread Interrupted");
+                Log.e("ERROR", "ProgressThread Interrupted");
             }
         	Message msg = mHandler.obtainMessage();
             Bundle b = new Bundle();
@@ -61,24 +63,22 @@ public class ProgressThread extends Thread {
         		@Override
 				public void onSuccess(String arg0) {
         			Log.i("orderCabMenu", "got request status "+arg0);
-        			statusSum += 1;
-        			
-        			//TODO udi
-        			//statusSum += arg0;
-        			
-        			// the third status answer
+        			//statusSum += 1;
+        			driverId = arg0;
         		}
         		@Override
                 public void onFailure(ServerFailure error) {
-        			Log.e("ERROR", "failed to connect the server");
+        			Log.e("ERROR", "ProgressThread failed to connect the server");
                 }
         	});
         	
-        	if (3>statusSum){
+        	//if (3>statusSum){
+        	// means no answer yet from the server
+        	if (driverId == null || driverId.equals("")){
         		try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    Log.e("ERROR", "Thread Interrupted");
+                    Log.e("ERROR", "ProgressThread Interrupted");
                 }
                 Message msg = mHandler.obtainMessage();
                 Bundle b = new Bundle();
@@ -109,5 +109,9 @@ public class ProgressThread extends Thread {
     
     public void setState(int state) {
         mState = state;
+    }
+    
+    public String getDriverId(){
+    	return driverId;
     }
 }
