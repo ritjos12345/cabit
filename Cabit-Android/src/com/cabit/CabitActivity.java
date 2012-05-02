@@ -65,71 +65,75 @@ public class CabitActivity extends Activity {
 	 */
 	private static final String TAG = "CabitActivity";
 
-	/**
-	 * The current context.
-	 */
-	private Context mContext = this;
+    /**
+     * The current context.
+     */
+    private Context mContext = this;
+    
+    
+    /**
+     * A {@link BroadcastReceiver} to receive the response from a register or
+     * unregister request, and to update the UI.
+     */
+    private final BroadcastReceiver mUpdateUIReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String accountName = intent.getStringExtra(DeviceRegistrar.ACCOUNT_NAME_EXTRA);
+            int status = intent.getIntExtra(DeviceRegistrar.STATUS_EXTRA,
+                    DeviceRegistrar.ERROR_STATUS);
+            String message = null;
+            String connectionStatus = Util.DISCONNECTED;
+            if (status == DeviceRegistrar.REGISTERED_STATUS) {
+                message = getResources().getString(R.string.registration_succeeded);
+                connectionStatus = Util.CONNECTED;
+            } else if (status == DeviceRegistrar.UNREGISTERED_STATUS) {
+                message = getResources().getString(R.string.unregistration_succeeded);
+            } else {
+                message = getResources().getString(R.string.registration_error);
+            }
 
-	/**
-	 * A {@link BroadcastReceiver} to receive the response from a register or
-	 * unregister request, and to update the UI.
-	 */
-	private final BroadcastReceiver mUpdateUIReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String accountName = intent
-					.getStringExtra(DeviceRegistrar.ACCOUNT_NAME_EXTRA);
-			int status = intent.getIntExtra(DeviceRegistrar.STATUS_EXTRA,
-					DeviceRegistrar.ERROR_STATUS);
-			String message = null;
-			String connectionStatus = Util.DISCONNECTED;
-			if (status == DeviceRegistrar.REGISTERED_STATUS) {
-				message = getResources().getString(
-						R.string.registration_succeeded);
-				connectionStatus = Util.CONNECTED;
-			} else if (status == DeviceRegistrar.UNREGISTERED_STATUS) {
-				message = getResources().getString(
-						R.string.unregistration_succeeded);
-			} else {
-				message = getResources().getString(R.string.registration_error);
-			}
+            // Set connection status
+            SharedPreferences prefs = Util.getSharedPreferences(mContext);
+            prefs.edit().putString(Util.CONNECTION_STATUS, connectionStatus).commit();
 
-			// Set connection status
-			SharedPreferences prefs = Util.getSharedPreferences(mContext);
-			prefs.edit().putString(Util.CONNECTION_STATUS, connectionStatus)
-					.commit();
+            // Display a notification
+            Util.generateNotification(mContext, String.format(message, accountName));
+        }
+    };
 
-			// Display a notification
-			Util.generateNotification(mContext,
-					String.format(message, accountName));
-		}
-	};
+	
 
-	/**
-	 * Begins the activity.
-	 */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate");
-		super.onCreate(savedInstanceState);
-
-		// Register a receiver to provide register/unregister notifications
-		registerReceiver(mUpdateUIReceiver, new IntentFilter(
-				Util.UPDATE_UI_INTENT));
+    /**
+     * Begins the activity.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+    	super.onCreate(savedInstanceState);
+        
+    	Log.i(TAG, "onCreate");
+        registerReceiver(mUpdateUIReceiver, new IntentFilter(Util.UPDATE_UI_INTENT));
+        
 
 		setContentView(R.layout.cabitactivity);
 	}
+
+    
+	@Override
+	protected void onPause() {
+		super.onPause();
+		finish();
+	}
+
 
 	@Override
 	public void onResume() {
 		super.onResume();
 
 		SharedPreferences prefs = Util.getSharedPreferences(mContext);
-		String connectionStatus = prefs.getString(Util.CONNECTION_STATUS,
-				Util.DISCONNECTED);
-		if (Util.DISCONNECTED.equals(connectionStatus)) {
-			startActivity(new Intent(this, AccountsActivity.class));
-		}
+        String connectionStatus = prefs.getString(Util.CONNECTION_STATUS, Util.DISCONNECTED);
+        if (Util.DISCONNECTED.equals(connectionStatus)) {
+            startActivity(new Intent(this, AccountsActivity.class));
+        }
 
 		setScreenContent(R.layout.cabitactivity);
 	}

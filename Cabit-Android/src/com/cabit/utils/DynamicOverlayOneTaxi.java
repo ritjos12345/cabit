@@ -29,6 +29,7 @@ public class DynamicOverlayOneTaxi extends DynamicOverlay<String>{
 		
 		mapView = map; 
 		timer = new Timer();
+		
 		myTaxiName = taxiName;
 	}
 	

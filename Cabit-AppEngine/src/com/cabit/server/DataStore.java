@@ -244,6 +244,7 @@ public class DataStore {
 	//create order, update the orders data structure and return it's order-id
 	public Order createOrder(GpsAddress from,GpsAddress to, String user){
 		
+		System.out.println("x0");
 		Order order = new Order();
 		order.setUser(user);
 		order.setId(NextOrderID);
@@ -254,12 +255,15 @@ public class DataStore {
 		
 		order.setFrom(from);
 		order.setTo(to);
-				
+			
+		System.out.println("x1");
 		//update the session's orders map
 		getOrders();
+		System.out.println("x2");
 		orders.put(order.getId(), order);
+		System.out.println("x3");
 		updateOrders(orders);
-		
+		System.out.println("x4");
 		return order;
 	}
 	

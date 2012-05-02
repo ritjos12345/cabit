@@ -60,6 +60,7 @@ public class MainActivity extends MapActivity {
 	ProgressThread progressThread;
 	Timer timer;
 
+	boolean isTimerRunning = true;
 
 	public void onPause(){
 		super.onPause();
@@ -74,6 +75,7 @@ public class MainActivity extends MapActivity {
         
         mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setBuiltInZoomControls(true);
+		mapView.setTraffic(true);
 		
 		myLocationOverlay =new DynamicOverlayMyLocation(this.getResources().getDrawable(R.drawable.dot), mapView, false);
 		mapView.getOverlays().add(myLocationOverlay);
@@ -87,10 +89,10 @@ public class MainActivity extends MapActivity {
 	    timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				Log.i(TAG, "updateTaxy");
-				UpdateTaxi();
-				
-				
+				if(isTimerRunning){
+					Log.i(TAG, "updateTaxy");
+					UpdateTaxi();
+				}
 			}
 		},0,1000*FPS);
     }
@@ -114,7 +116,7 @@ public class MainActivity extends MapActivity {
 		
 		
 private void UpdateTaxi() {
-	System.out.println("StartUpdate!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	//System.out.println("StartUpdate!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	new AsyncTask<Void, Void, TaxiStatusProxy>(){
 		private TaxiStatusProxy result;
 		@Override
@@ -122,23 +124,22 @@ private void UpdateTaxi() {
 			// TODO Auto-generated method stub
 			MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
             final CabitRequest request = requestFactory.cabitRequest();
-            System.out.println("before requestttttttttttttttt");
+            //System.out.println("before requestttttttttttttttt");
             
             // ask about the current gps locatoin
             Location loc = Util.GetMyLocation(mContext);
             
             GpsLocationProxy myGpsLoc = request.create(GpsLocationProxy.class);
             
-            // get the current gps pos details 
-            try{
+            // get the current gps pos details
+            if(loc != null){
             	myGpsLoc.setLatitude((long) loc.getLatitude());
                 myGpsLoc.setLongitude((long) loc.getLongitude());
-            }
-            catch(Exception e){
+            }else{
             	// in case that couldn't retrieve the gps location, set fake pos
-            	myGpsLoc.setLatitude((int) (33.5*1e6));
-                myGpsLoc.setLongitude((int) (34.5*1e6));
-                Log.e("orderCabMenu", "couldn't retrieve the gps location");
+            	myGpsLoc.setLatitude((int) (32.117566*1e6));
+                myGpsLoc.setLongitude((int) (34.801598*1e6));
+                //Log.e(TAG, "couldn't retrieve the gps location");
             }
             
             request.UpdateLocation(myGpsLoc).fire(new Receiver<TaxiStatusProxy>() {
@@ -147,7 +148,7 @@ private void UpdateTaxi() {
 				public void onSuccess(TaxiStatusProxy arg0) {
 					// TODO Auto-generated method stub
 					result = arg0;
-					System.out.println("sucsessssssssssssss");
+					//System.out.println("sucsessssssssssssss");
 				}
 			});
 			return result;
@@ -155,7 +156,19 @@ private void UpdateTaxi() {
 		
 		@Override
         protected void onPostExecute(TaxiStatusProxy result) {
-			clientWantsYou().show();
+			if(result!= null){
+				if(result.getOrders() != null && result.getOrders().size() > 0){
+					isTimerRunning = false;
+					String from = result.getOrders().get(0).getFrom().getTitle();
+					String to = result.getOrders().get(0).getTo().getTitle();
+					int orderId = result.getOrders().get(0).getId();
+					if(from == null) 
+						from = "";
+					if(to == null) 
+						to = "";
+					clientWantsYou(from, to, orderId).show();
+				}
+			}
 		}
 		
 	}.execute();
@@ -170,37 +183,35 @@ private void msgDisplay(String msg)
 
     /**
      * This method zooms to the user's location with a zoom level of 10.
+     * @param to 
+     * @param from 
+     * @param orderId 
      * @return 
      */
-    private AlertDialog clientWantsYou() {
+    private AlertDialog clientWantsYou(String from, String to, final int orderId) {
     	
     	
 
-	    	    // Define the Handler that receives messages from the thread and update the progress
-	    	    final Handler handler = new Handler() {
-	    	        public void handleMessage(Message msg) {
-	    	            int total = msg.getData().getInt("total");
-	    	            progressDialog.setProgress(total);
-	    	            if (total >= 100){
-	    	                //dismissDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
-	    	            	progressDialog.dismiss();
-	    	                progressThread.setState(ProgressThread.STATE_DONE);
-	    	                msgDisplay("Progress Dialog is Done");
-	    	            }
-	    	        }
-	    	    };
+	    // Define the Handler that receives messages from the thread and update the progress
+	    final Handler handler = new Handler() {
+	        public void handleMessage(Message msg) {
+	            int total = msg.getData().getInt("total");
+	            progressDialog.setProgress(total);
+	            if (total >= 100){
+	                //dismissDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
+	            	progressDialog.dismiss();
+	                progressThread.setState(ProgressThread.STATE_DONE);
+	                msgDisplay("Progress Dialog is Done");
+	            }
+	        }
+	    };
 
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
     	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("A client have choose you!"+'\n'+"Would you like to pick him?");
+        builder.setMessage("A client have choose you!\n"+
+        					"From: "+ from +"\n"+
+        					"To: "+ to +"\n"+
+        					"A client have choose you!"+"\n"+
+        					"Would you like to pick him?");
         builder.setTitle("New Cab Order!");
         builder.setIcon(R.drawable.taxi);
         builder.setCancelable(false);
@@ -217,22 +228,28 @@ private void msgDisplay(String msg)
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
         	
                public void onClick(DialogInterface dialog, int id) {
-               	   progressDialog.show();
+            	   updateOrder(orderId,true);
+               	   
             	   //showDialog(PROGRESS_HORIZONTAL_DIALOG_ID);
                	
-                   progressThread = new ProgressThread(handler);
-                    progressThread.start();
+               	   //progressDialog.show();
+                   //progressThread = new ProgressThread(handler);
+                    //progressThread.start();
+                    
+                    isTimerRunning = true;
                    //msgDisplay("Client was update.");
                }
            });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                public void onClick(DialogInterface dialog, int id) {
+            	   updateOrder(orderId,false);
                	ProgressDialog.show(MainActivity.this, "","Canceling the client...", false,true,new DialogInterface.OnCancelListener(){
                        public void onCancel(DialogInterface dialog){
                            msgDisplay("Action is cancelled");
                           }
                       });
                    msgDisplay("Client was canceled.");
+                   isTimerRunning = true;
                }
            });
         AlertDialog alert = builder.create();
@@ -243,6 +260,41 @@ private void msgDisplay(String msg)
     
 
     
+    
+    protected void updateOrder(final int orderId, final boolean status){
+    	new AsyncTask<Void, Void, Boolean>() {
+    		Boolean result = null;
+            
+			@Override
+			protected Boolean doInBackground(Void... params) {
+
+				    MyRequestFactory requestFactory = Util.getRequestFactory(getBaseContext(), MyRequestFactory.class);
+	                final CabitRequest request = requestFactory.cabitRequest();
+
+	                request.UpdateOrder(orderId,status).fire(new Receiver<Boolean>() {
+                	@Override
+					public void onSuccess(Boolean arg0) {
+						result = arg0;
+					}
+					
+					@Override
+                    public void onFailure(ServerFailure error) {
+                		result = null;
+                    }
+				});
+				return result;
+			}
+	        @Override
+            protected void onPostExecute(Boolean result) {
+            	if(result!=null){
+            		
+            	}
+            }
+			
+        }.execute();
+    	
+    	
+    }
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false;

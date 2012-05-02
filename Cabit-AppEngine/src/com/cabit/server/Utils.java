@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import com.cabit.server.infrastructure.SendMessage;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -36,7 +35,8 @@ public class Utils {
 	
 	public static String getUserEmail() {
 	 UserService userService = UserServiceFactory.getUserService();
-     User user = userService.getCurrentUser();
+     User user = userService.getCurrentUser();    
+     user.getEmail();
      return user.getEmail();
    }
 

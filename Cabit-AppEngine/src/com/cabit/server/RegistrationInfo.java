@@ -16,7 +16,7 @@
  */
 
 //////////////////////////// DO NOT CHANGE THIS FILE ///////////////////// 
-package com.cabit.server.infrastructure;
+package com.cabit.server;
 
 import com.google.android.c2dm.server.PMF;
 import com.google.appengine.api.datastore.Key;

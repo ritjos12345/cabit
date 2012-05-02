@@ -76,7 +76,7 @@ public class ProgressThread extends Thread {
         	// means no answer yet from the server
         	if (driverId == null || driverId.equals("")){
         		try {
-                    Thread.sleep(100);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     Log.e("ERROR", "ProgressThread Interrupted");
                 }

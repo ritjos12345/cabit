@@ -138,19 +138,19 @@ public class DynamicOverlayMyLocation extends MyLocationOverlay {
         public synchronized void onLocationChanged(final Location location) {
         	super.onLocationChanged(location);
         	
-        	if(notifyMyLocation)
-        	new AsyncTask<Void, Void, GpsLocationProxy>() {
-        		MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
-        		CabitRequest request = requestFactory.cabitRequest();
-        		GpsLocationProxy loc = request.create(GpsLocationProxy.class);
-        		GpsLocationProxy res =null;
-				@Override
-				protected GpsLocationProxy doInBackground(Void... params) {
-					request.UpdateLocation(loc).fire();
-					return res;
-				}
-        		
-        	}.execute();
-        	
+        	if(notifyMyLocation){
+	        	new AsyncTask<Void, Void, GpsLocationProxy>() {
+	        		MyRequestFactory requestFactory = Util.getRequestFactory(mContext, MyRequestFactory.class);
+	        		CabitRequest request = requestFactory.cabitRequest();
+	        		GpsLocationProxy loc = request.create(GpsLocationProxy.class);
+	        		GpsLocationProxy res =null;
+					@Override
+					protected GpsLocationProxy doInBackground(Void... params) {
+						request.UpdateLocation(loc).fire();
+						return res;
+					}
+	        		
+	        	}.execute();
+        	}
         }
 }
