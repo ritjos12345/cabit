@@ -16,6 +16,7 @@ public class CabitService {
 	// update Taxi's location, return list of (pending) orders
 	@ServiceMethod
 	public TaxiStatus UpdateLocation(GpsLocation loc){
+		System.out.println("UpdateLocation");
 		return db.updateTaxiGpsLocation(loc, Utils.getUserEmail());
 	}
 	
@@ -95,7 +96,7 @@ public class CabitService {
 	public Taxi GetTaxi(String driver){		//GetTaxi?!?! F*** them
 		
 		///////////////////////////////////////
-		//System.out.println("GetTaxi");
+		System.out.println("GetTaxi: "+driver);
 		///////////////////////////////////////
 		
 		return db.findTaxi(driver);
@@ -106,9 +107,8 @@ public class CabitService {
 	//@ServiceMethod
 	public List<Taxi> GetAllTaxi(){
 		///////////////////////////////////////
-		//System.out.println("getAllTaxi");
+		System.out.println("getAllTaxi");
 		///////////////////////////////////////
-		
 		return db.allCabs();
 	}
 	
