@@ -1,6 +1,5 @@
 package com.cabit.server;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +11,18 @@ public class CabitService {
 	private static DataStore db = DataStore.GetInstance();
 
 	//// Taxi RPC functions ////
+	
+	//update Taxi's status line
+	@ServiceMethod
+	public boolean updadateStatusLine(String newStatusLine){
+		boolean r = db.updateStatusLine(newStatusLine, Utils.getUserEmail());
+		
+		////////////////////////////////////////
+		System.out.println("driver's status line was updated, " + Utils.getUserEmail());
+		////////////////////////////////////////
+		
+		return r;
+	}
 	
 	// update Taxi's location, return list of (pending) orders
 	@ServiceMethod
@@ -32,6 +43,9 @@ public class CabitService {
 			return false;
 		}
 	}
+	
+	
+	
 	
 	
 	

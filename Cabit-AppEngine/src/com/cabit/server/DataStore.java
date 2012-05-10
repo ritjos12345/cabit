@@ -107,7 +107,7 @@ public class DataStore {
 	public TaxiStatus updateTaxiGpsLocation(GpsLocation loc, String cabName) {  //return GpsLocation??
 		
 		/////////////////////
-		//System.out.println("updateGpsLocation @ DataStore");
+		System.out.println("updateGpsLocation @ DataStore, " + cabName);
 		/////////////////////	
 		
 		this.getDrivers();
@@ -119,7 +119,7 @@ public class DataStore {
 		if (driver != null && loc != null){
 			
 			//////////////////////////////////////////////////
-			//System.out.println("update existing driver");
+			System.out.println("update existing driver, " + cabName);
 			//////////////////////////////////////////////////
 			
 			driver.setGpsLocation(loc);
@@ -129,7 +129,7 @@ public class DataStore {
 		else{
 			
 			////////////////////////////////////////////////
-			//System.out.println("create new driver");
+			System.out.println("create new driver: " + cabName);
 			///////////////////////////////////////////////
 			
 			driver = new Taxi();
@@ -161,7 +161,13 @@ public class DataStore {
 		Taxi taxi = drivers.get(cabName);
 		
 		//if order is still available
-		if (ord != null){			
+		if (ord != null){
+			
+			////////////////////////////////////////////////
+			System.out.println("driver assigned another job, " + cabName);
+			///////////////////////////////////////////////
+			
+			
 			//remove references to the order from other taxis
 			ord.removeDrivers(taxi);
 			
@@ -188,6 +194,12 @@ public class DataStore {
 			return true;			
 		}
 		else{
+			
+			////////////////////////////////////////////////
+			System.out.println("driver failed to take a job, " + cabName);
+			///////////////////////////////////////////////
+			
+			
 			//remove the order from the driver's list of pending orders
 			taxi.removeOrder(orderId);
 			
@@ -203,6 +215,10 @@ public class DataStore {
 	
 	//remove order represented by it's id from the driver's pending orders
 	public void rejectOrder(Integer orderId, String cabName){
+		
+		////////////////////////////////////////////////
+		System.out.println("driver rejected a job offer, " + cabName);
+		///////////////////////////////////////////////
 		
 		//find the driver's object
 		getDrivers();
@@ -243,6 +259,10 @@ public class DataStore {
 	
 	//create order, update the orders data structure and return it's order-id
 	public Order createOrder(GpsAddress from,GpsAddress to, String user){
+		
+		////////////////////////////////////////////////
+		System.out.println("new order is created, " + user);
+		///////////////////////////////////////////////
 		
 		System.out.println("x0");
 		Order order = new Order();
@@ -435,4 +455,33 @@ public class DataStore {
 		//update the data structure
 		updateDrivers(drivers);
 	}
+	
+	
+	//update the driver's statusLine
+	public boolean updateStatusLine(String newStatusLine, String cabName){
+		//find the cab
+		this.getDrivers();
+		Taxi cab = drivers.get(cabName);
+		
+		if (cab != null){
+		
+			drivers.remove(cabName);
+			
+			//update the cab's status line
+			cab.setStatusLine(newStatusLine);
+			
+			drivers.put(cabName, cab);
+			
+			//update the drivers
+			this.updateDrivers(drivers);
+			
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	
+	//private boolean driverWithClient(String cabName){  
 }

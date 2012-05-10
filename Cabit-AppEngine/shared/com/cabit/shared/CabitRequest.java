@@ -27,6 +27,8 @@ public interface CabitRequest extends RequestContext {
 	
 	Request<List<TaxiProxy>> GetAllTaxi();
 	
+	Request<Boolean> updadateStatusLine(String newStatusLine);
+	
 	/*
 	Request<TaxiStatusProxy> createTaxiStatus();
 
