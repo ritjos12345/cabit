@@ -7,7 +7,9 @@ import com.google.web.bindery.requestfactory.shared.ValueProxy;
 public interface TaxiProxy extends ValueProxy {
 
 	String getDriver();
-
+	
+	String getStatusLine();
+	
 	void setDriver(String driver);
 
 	GpsLocationProxy getGpsLocation();

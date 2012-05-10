@@ -12,13 +12,22 @@ public class Taxi implements Serializable{
 	private String driver;
 	private GpsLocation gpsLocation;
 	private TaxiStatus status;
+	private String statusLine;
 	
 	
 	public Taxi(){
 		status = new TaxiStatus();
+		statusLine = new String();
+	}
+	
+	public String getStatusLine() {
+		return statusLine;
 	}
 
-	
+	public void setStatusLine(String statusLine) {
+		this.statusLine = statusLine;
+	}
+
 	//add another order to the taxi's current status
 	public void newOrder(Order ord){
 		status.addOrder(ord);
